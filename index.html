@@ -958,6 +958,8 @@ footer {
 
 <script>
 const GRID = 1000;
+const SUPABASE_URL = "https://rdrsqylyvgoafuzoljis.supabase.co;
+const SUPABASE_KEY = "sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB;
 const PRICE_PER_PIXEL = 1;
 
 const canvas = document.getElementById("pixelCanvas");
@@ -1216,7 +1218,7 @@ document.getElementById("logo").addEventListener("change", function() {
   reader.readAsDataURL(file);
 });
 
-document.getElementById("purchaseForm").addEventListener("submit", function(event) {
+document.getElementById("purchaseForm").addEventListener("submit", async function(event) {
   event.preventDefault();
 
   if (selected.size === 0) {
@@ -1229,34 +1231,51 @@ document.getElementById("purchaseForm").addEventListener("submit", function(even
   const email = document.getElementById("email").value.trim();
   const website = document.getElementById("website").value.trim();
   const notes = document.getElementById("notes").value.trim();
-  const logoFile = document.getElementById("logo").files[0];
-
   const count = selected.size;
-  const total = count * PRICE_PER_PIXEL;
-
-  const message = [
-    "RICHIESTA DIMOSTRATIVA — MILLION PIXEL ITALIA",
-    "",
-    "Nome o azienda: " + company,
-    "Email: " + email,
-    "Sito internet: " + (website || "Non indicato"),
-    "Pixel selezionati: " + formatNumber(count),
-    "Prezzo per pixel: " + formatEuro(PRICE_PER_PIXEL),
-    "Totale: " + formatEuro(total),
-    "Immagine/logo: " + (logoFile ? logoFile.name : "Non caricato"),
-    "Messaggio: " + (notes || "Nessuno"),
-    "",
-    "Questa richiesta non è stata inviata: il sito è ancora una demo."
-  ].join("\n");
 
   const output = document.getElementById("requestOutput");
-  output.textContent = message;
   output.style.display = "block";
+  output.textContent = "Invio della richiesta in corso...";
 
-  output.scrollIntoView({
-    behavior: "smooth",
-    block: "nearest"
-  });
+  try {
+    const response = await fetch(
+      SUPABASE_URL + "/rest/v1/pixel_ads",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({
+          company_name: company,
+          email: email,
+          website_url: website || null,
+          message: notes || null,
+          pixel_count: count
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText);
+    }
+
+    output.textContent =
+      "Richiesta inviata correttamente! Hai richiesto " +
+      count + " pixel per un totale di " +
+      formatEuro(count * PRICE_PER_PIXEL) +
+      ". La richiesta è in attesa di conferma del pagamento.";
+
+  } catch (error) {
+    console.error("Errore Supabase:", error);
+    output.textContent =
+      "Non è stato possibile inviare la richiesta. Riprova più tardi.";
+  }
+
+  output.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
 
 createHeroPixelArt();
