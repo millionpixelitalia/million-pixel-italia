@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Million Pixel Italia</title>
+  <style>
+    :root {
+      --bg: #080a0b;
+      --panel: #111519;
+      --green: #d5ff32;
+      --text: #f5f7f7;
+      --muted: #a5adb3;
+      --border: #2a3338;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 35px;
+    }
+    .brand { font-size: 22px; font-weight: 800; }
+    .brand span { color: var(--green); }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    h1 { font-size: clamp(26px, 4vw, 38px); }
+    h2 { font-size: 20px; }
+    p { color: var(--muted); line-height: 1.5; }
+    label { display: block; margin: 14px 0 7px; }
+    input {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      color: white;
+      background: #080a0b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 17px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--green);
+      color: #101300;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button.secondary {
+      color: white;
+      background: #20272c;
+      border: 1px solid var(--border);
+    }
+    .hidden { display: none; }
+    .message { margin-top: 15px; overflow-wrap: anywhere; }
+    .error { color: #ff8585; }
+    .success { color: var(--green); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 650px; }
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th { color: var(--green); }
+    td { overflow-wrap: anywhere; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .status { font-weight: bold; }
+    @media (max-width: 600px) {
+      body { padding: 14px; }
+      .panel { padding: 16px; }
+      header { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">MILLION PIXEL <span>ITALIA</span></div>
+    <button id="logoutBtn" class="secondary hidden" type="button">Esci</button>
+  </header>
+
+  <section id="loginPanel" class="panel">
+    <h1>Area amministratore</h1>
+    <p>Accedi per consultare le richieste inviate dal sito.</p>
+    <form id="loginForm">
+      <label for="email">Email amministratore</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <p><button type="submit">Accedi</button></p>
+    </form>
+    <div id="loginMessage" class="message" role="status"></div>
+  </section>
+
+  <section id="dashboard" class="hidden">
+    <div class="panel">
+      <h1>Richieste ricevute</h1>
+      <p>Le richieste sono visualizzate in ordine dalla più recente.</p>
+      <button id="refreshBtn" type="button">Aggiorna richieste</button>
+      <div id="dashboardMessage" class="message" role="status"></div>
+    </div>
+    <div class="panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Email</th>
+            <th>Pixel</th>
+            <th>Stato</th>
+            <th>Messaggio</th>
+          </tr>
+        </thead>
+        <tbody id="requestsBody">
+          <tr><td colspan="6">Accedi per caricare le richieste.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+const SUPABASE_URL = "https://rdrsqylyvgoafuzoljis.supabase.co";
+const SUPABASE_KEY = "sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
+
+const loginPanel = document.getElementById("loginPanel");
+const dashboard = document.getElementById("dashboard");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+const dashboardMessage = document.getElementById("dashboardMessage");
+const requestsBody = document.getElementById("requestsBody");
+const logoutBtn = document.getElementById("logoutBtn");
+
+let accessToken = null;
+
+function showMessage(element, text, isError = false) {
+  element.textContent = text;
+  element.className = "message " + (isError ? "error" : "success");
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(SUPABASE_URL + path, {
+    ...options,
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + (accessToken || SUPABASE_KEY),
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+
+  const text = await response.text();
+  let data;
+  try { data = text ? JSON.parse(text) : null; }
+  catch { data = text; }
+
+  if (!response.ok) {
+    const detail = data && data.msg ? data.msg :
+      data && data.message ? data.message : text;
+    throw new Error(detail || "Errore del server (" + response.status + ")");
+  }
+  return data;
+}
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  showMessage(loginMessage, "Accesso in corso…");
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  try {
+    const result = await api("/auth/v1/token?grant_type=password", {
+      method: "POST",
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!result || !result.access_token) {
+      throw new Error("Supabase non ha restituito un token di accesso.");
+    }
+
+    accessToken = result.access_token;
+    loginPanel.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+    logoutBtn.classList.remove("hidden");
+    await loadRequests();
+  } catch (error) {
+    showMessage(loginMessage,
+      "Accesso non riuscito. Controlla email e password. " + error.message,
+      true);
+  }
+});
+
+async function loadRequests() {
+  showMessage(dashboardMessage, "Caricamento richieste…");
+  requestsBody.replaceChildren();
+
+  try {
+    const rows = await api(
+      "/rest/v1/pixel_ads?select=id,company_name,email,website_url,message,pixel_count,status,created_at&order=created_at.desc"
+    );
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      requestsBody.innerHTML =
+        '<tr><td colspan="6">Non ci sono richieste da mostrare.</td></tr>';
+    } else {
+      for (const row of rows) {
+        const tr = document.createElement("tr");
+        const values = [
+          row.created_at ? new Date(row.created_at).toLocaleString("it-IT") : "—",
+          row.company_name || "—",
+          row.email || "—",
+          String(row.pixel_count ?? 0),
+          row.status || "pending",
+          row.message || "—"
+        ];
+
+        for (const value of values) {
+          const td = document.createElement("td");
+          td.textContent = value;
+          tr.appendChild(td);
+        }
+        requestsBody.appendChild(tr);
+      }
+    }
+
+    showMessage(dashboardMessage, "Richieste caricate.");
+  } catch (error) {
+    showMessage(
+      dashboardMessage,
+      "Non riesco a leggere le richieste: " + error.message,
+      true
+    );
+    requestsBody.innerHTML =
+      '<tr><td colspan="6">Controlla le autorizzazioni del database.</td></tr>';
+  }
+}
+
+document.getElementById("refreshBtn").addEventListener("click", loadRequests);
+
+logoutBtn.addEventListener("click", () => {
+  accessToken = null;
+  loginForm.reset();
+  dashboard.classList.add("hidden");
+  loginPanel.classList.remove("hidden");
+  logoutBtn.classList.add("hidden");
+  requestsBody.replaceChildren();
+  showMessage(loginMessage, "Hai effettuato la disconnessione.");
+});
+
+(async function restoreSession() {
+  try {
+    const saved = sessionStorage.getItem("millionPixelAdminSession");
+    if (!saved) return;
+    const session = JSON.parse(saved);
+    if (!session.access_token || !session.expires_at ||
+        session.expires_at * 1000 <= Date.now()) return;
+
+    accessToken = session.access_token;
+    const user = await api("/auth/v1/user");
+    if (!user || !user.id) return;
+
+    loginPanel.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+    logoutBtn.classList.remove("hidden");
+    await loadRequests();
+  } catch {
+    accessToken = null;
+  }
+})();
+</script>
+</body>
+</html>
