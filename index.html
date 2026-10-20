@@ -134,7 +134,6 @@ footer{margin-top:45px;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
-
 <header class="topbar">
 <div class="container nav">
 <a class="brand" href="#inizio"><span class="brand-mark">M</span><span class="brand-name">Million Pixel <span>Italia</span></span></a>
@@ -228,9 +227,9 @@ footer{margin-top:45px;border-top:1px solid var(--line)}
 <div class="field full"><label for="logo">Logo o immagine (facoltativo)</label><input type="file" id="logo" accept="image/*"><img id="logoPreview" alt="Anteprima del logo scelto"></div>
 <div class="field full"><label for="notes">Messaggio (facoltativo)</label><textarea id="notes" placeholder="Scrivi un breve messaggio..."></textarea></div>
 </div>
-<button type="submit" class="btn btn-primary full-btn" style="margin-top:20px">Prepara la richiesta ↗</button>
+<button type="submit" class="btn btn-primary full-btn" style="margin-top:20px">Procedi al pagamento ↗</button>
 <div id="requestOutput" aria-live="polite"></div>
-<p class="fine-print">Le richieste inviate saranno registrate per essere esaminate. Il pagamento e l'acquisto permanente dei pixel non sono ancora attivi; la richiesta non riserva i pixel. Il logo selezionato è solo un'anteprima e non viene caricato sul server.</p>
+<p class="fine-print">Il pagamento viene elaborato da Stripe. I pixel saranno pubblicati soltanto dopo la conferma verificata del pagamento. Il logo selezionato è solo un'anteprima e non viene caricato sul server.</p>
 </form>
 </div>
 <aside class="card">
@@ -243,7 +242,7 @@ footer{margin-top:45px;border-top:1px solid var(--line)}
 <div class="summary-row summary-total"><span>Totale</span><strong id="summaryPrice">0,00 €</strong></div>
 </div>
 <a href="#griglia" class="btn btn-secondary full-btn">Torna alla griglia ↑</a>
-<p class="fine-print">La selezione non riserva i pixel. Il prezzo è dimostrativo e non è un pagamento.</p>
+<p class="fine-print">La selezione non riserva i pixel fino alla conferma del pagamento.</p>
 </aside>
 </div>
 </div>
@@ -258,7 +257,7 @@ footer{margin-top:45px;border-top:1px solid var(--line)}
 <div class="how-grid">
 <article class="how-card"><div class="how-number">01</div><h3>Scegli il tuo spazio</h3><p>Seleziona un quadratino oppure trascina per scegliere un'area.</p></article>
 <article class="how-card"><div class="how-number">02</div><h3>Prepara la tua immagine</h3><p>Inserisci il tuo nome, i riferimenti e il logo che vorresti associare.</p></article>
-<article class="how-card"><div class="how-number">03</div><h3>Diventa parte del progetto</h3><p>Quando gli acquisti saranno attivi, potrai registrare il tuo spazio.</p></article>
+<article class="how-card"><div class="how-number">03</div><h3>Diventa parte del progetto</h3><p>Completa il pagamento per registrare il tuo spazio.</p></article>
 </div>
 </div>
 </section>
@@ -279,17 +278,16 @@ footer{margin-top:45px;border-top:1px solid var(--line)}
 
 <script>
 const GRID = 1000;
-
-/* Queste due righe devono contenere i dati del TUO progetto Supabase. */
 const SUPABASE_URL = "https://rdrsqylyvgoafuzoljis.supabase.co";
 const SUPABASE_KEY = "sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
-
 const PRICE_PER_PIXEL = 1;
+
 const canvas = document.getElementById("pixelCanvas");
 const ctx = canvas.getContext("2d");
 const stage = document.getElementById("canvasStage");
 const gridOverlay = document.getElementById("gridOverlay");
 const selected = new Set();
+const occupied = new Set();
 
 let cellSize = 20;
 let dragging = false;
@@ -351,15 +349,15 @@ function drawGrid() {
   ctx.clearRect(0, 0, GRID, GRID);
   ctx.fillStyle = "#252a30";
   ctx.fillRect(0, 0, GRID, GRID);
-ctx.fillStyle = "#687078";
 
-for (const index of occupied) {
-  const x = index % GRID;
-  const y = Math.floor(index / GRID);
-  ctx.fillRect(x, y, 1, 1);
-}
+  ctx.fillStyle = "#687078";
+  for (const index of occupied) {
+    const x = index % GRID;
+    const y = Math.floor(index / GRID);
+    ctx.fillRect(x, y, 1, 1);
+  }
+
   ctx.fillStyle = "#a5ff38";
-
   for (const index of selected) {
     const x = index % GRID;
     const y = Math.floor(index / GRID);
@@ -376,7 +374,7 @@ for (const index of occupied) {
     ctx.fillRect(left, top, right - left + 1, bottom - top + 1);
   }
 }
-const occupied = new Set();
+
 async function loadOccupiedPixels() {
   try {
     const response = await fetch(
@@ -398,7 +396,6 @@ async function loadOccupiedPixels() {
     }
 
     const positions = await response.json();
-
     occupied.clear();
 
     for (const position of positions) {
@@ -410,6 +407,7 @@ async function loadOccupiedPixels() {
     console.error("Errore di connessione:", error);
   }
 }
+
 function updateSummary() {
   const count = selected.size;
   const price = count * PRICE_PER_PIXEL;
@@ -439,7 +437,11 @@ function addRectangleToSelection(rectangle) {
 
   for (let y = top; y <= bottom; y++) {
     for (let x = left; x <= right; x++) {
-     if (!occupied.has(y * GRID + x)) selected.add(y * GRID + x);
+      const index = y * GRID + x;
+
+      if (!occupied.has(index)) {
+        selected.add(index);
+      }
     }
   }
 }
@@ -572,51 +574,68 @@ document.getElementById("purchaseForm").addEventListener("submit", async functio
   const email = document.getElementById("email").value.trim();
   const website = document.getElementById("website").value.trim();
   const notes = document.getElementById("notes").value.trim();
-  const count = selected.size;
+  const positions = Array.from(selected);
+
   const output = document.getElementById("requestOutput");
+  const submitButton = this.querySelector('button[type="submit"]');
 
   output.style.display = "block";
-  output.textContent = "Invio della richiesta in corso...";
+  output.textContent = "Collegamento a Stripe in corso...";
+  submitButton.disabled = true;
 
   try {
-    const response = await fetch(SUPABASE_URL + "/rest/v1/pixel_ads", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY,
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({
-        company_name: company,
-        email: email,
-        website_url: website || null,
-       message: notes || null,
-pixel_count: count,
-pixel_positions: Array.from(selected)
-      })
-    });
+    const response = await fetch(
+      SUPABASE_URL + "/functions/v1/create-checkout",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        },
+        body: JSON.stringify({
+          company_name: company,
+          email: email,
+          website_url: website,
+          message: notes,
+          pixel_positions: positions
+        })
+      }
+    );
+
+    const result = await response.json();
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
+      throw new Error(
+        result.error || "Errore durante la preparazione del pagamento."
+      );
     }
 
-    output.textContent =
-      "Richiesta inviata correttamente! Hai richiesto " +
-      count + " pixel per un totale di " +
-      formatEuro(count * PRICE_PER_PIXEL) +
-      ". La richiesta è in attesa di conferma. Il pagamento non è ancora attivo.";
+    if (!result.checkout_url) {
+      throw new Error("Stripe non ha restituito il link di pagamento.");
+    }
+
+    const checkoutUrl = new URL(result.checkout_url);
+
+    if (
+      checkoutUrl.protocol !== "https:" ||
+      checkoutUrl.hostname !== "checkout.stripe.com"
+    ) {
+      throw new Error("Indirizzo di pagamento Stripe non valido.");
+    }
+
+    output.textContent = "Apertura della pagina di pagamento...";
+    window.location.assign(checkoutUrl.href);
 
   } catch (error) {
-    console.error("Errore Supabase:", error);
-    output.textContent =
-      "Non è stato possibile inviare la richiesta. Controlla che la tabella pixel_ads " +
-      "contenga la colonna email e che la policy INSERT per anon sia attiva. " +
-      "Se il problema continua, verifica l'errore nella console del browser.";
-  }
+    console.error("Errore checkout:", error);
 
-  output.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    output.textContent =
+      "Non è stato possibile aprire il pagamento. " +
+      (error instanceof Error ? error.message : "Errore di connessione.");
+
+    submitButton.disabled = false;
+  }
 });
 
 createHeroPixelArt();
