@@ -351,7 +351,13 @@ function drawGrid() {
   ctx.clearRect(0, 0, GRID, GRID);
   ctx.fillStyle = "#252a30";
   ctx.fillRect(0, 0, GRID, GRID);
+ctx.fillStyle = "#687078";
 
+for (const index of occupied) {
+  const x = index % GRID;
+  const y = Math.floor(index / GRID);
+  ctx.fillRect(x, y, 1, 1);
+}
   ctx.fillStyle = "#a5ff38";
 
   for (const index of selected) {
@@ -370,7 +376,40 @@ function drawGrid() {
     ctx.fillRect(left, top, right - left + 1, bottom - top + 1);
   }
 }
+const occupied = new Set();
+async function loadOccupiedPixels() {
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/rpc/get_approved_pixel_positions`,
+      {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: "{}"
+      }
+    );
 
+    if (!response.ok) {
+      console.error("Errore caricamento pixel:", await response.text());
+      return;
+    }
+
+    const positions = await response.json();
+
+    occupied.clear();
+
+    for (const position of positions) {
+      occupied.add(Number(position));
+    }
+
+    drawGrid();
+  } catch (error) {
+    console.error("Errore di connessione:", error);
+  }
+}
 function updateSummary() {
   const count = selected.size;
   const price = count * PRICE_PER_PIXEL;
@@ -552,8 +591,9 @@ document.getElementById("purchaseForm").addEventListener("submit", async functio
         company_name: company,
         email: email,
         website_url: website || null,
-        message: notes || null,
-        pixel_count: count
+       message: notes || null,
+pixel_count: count,
+pixel_positions: Array.from(selected)
       })
     });
 
@@ -582,6 +622,7 @@ document.getElementById("purchaseForm").addEventListener("submit", async functio
 createHeroPixelArt();
 updateCanvasSize();
 updateSummary();
+loadOccupiedPixels();
 </script>
 </body>
 </html>
