@@ -439,7 +439,7 @@ function addRectangleToSelection(rectangle) {
 
   for (let y = top; y <= bottom; y++) {
     for (let x = left; x <= right; x++) {
-      selected.add(y * GRID + x);
+     if (!occupied.has(y * GRID + x)) selected.add(y * GRID + x);
     }
   }
 }
