@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090b0a">
+<meta name="description" content="Million Pixel Italia: scegli i tuoi pixel a 1 euro ciascuno.">
+<title>Million Pixel Italia — Un pixel alla volta</title>
+<style>
+:root{--bg:#090b0a;--surface:#111511;--green:#a5ff38;--white:#f5f7f2;--muted:#a2aaa0;--line:#293129}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:85px}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Arial,Helvetica,sans-serif;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.container{width:min(1160px,calc(100% - 36px));margin:0 auto}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(9,11,10,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+.nav{min-height:72px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px}
+.brand-mark{width:36px;height:36px;display:grid;place-items:center;border-radius:9px;color:#10150b;background:var(--green)}
+.brand-name span{color:var(--green)}
+.nav-links{display:flex;align-items:center;gap:22px;color:#c4ccc2;font-size:13px}
+.nav-links a:hover{color:var(--green)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 17px;border:1px solid transparent;border-radius:8px;font-size:13px;font-weight:800;transition:transform .2s,background .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{color:#10150b;background:var(--green)}
+.btn-primary:hover{background:#bdff79}
+.btn-secondary{color:white;background:#171d18;border-color:#394439}
+.hero{padding:78px 0 55px;border-bottom:1px solid var(--line);background:radial-gradient(ellipse at 80% 25%,rgba(110,190,38,.13),transparent 40%),var(--bg)}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:42px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #34452a;border-radius:50px;color:var(--green);background:#11190e;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+h1{margin:23px 0 18px;font-size:clamp(40px,6vw,74px);line-height:1;letter-spacing:-3px}
+h1 span{color:var(--green)}
+.hero-copy{max-width:550px;color:#b0b8ae;font-size:16px;line-height:1.8}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.hero-note{margin-top:20px;color:#879184;font-size:12px}
+.hero-art{min-height:310px;display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid #2a3827;border-radius:18px;background:radial-gradient(circle at center,rgba(165,255,56,.12),transparent 55%),#0d110d}
+.hero-art::before{content:"";position:absolute;inset:0;opacity:.4;background-image:linear-gradient(#253020 1px,transparent 1px),linear-gradient(90deg,#253020 1px,transparent 1px);background-size:22px 22px}
+.pixel-art{position:relative;display:grid;grid-template-columns:repeat(10,18px);grid-template-rows:repeat(10,18px);gap:3px;transform:rotate(-5deg)}
+.pixel-art span{border:1px solid #293328;background:#151b14}
+.pixel-art span.lit{background:var(--green);border-color:var(--green);box-shadow:0 0 12px #a5ff3844}
+.art-label{position:absolute;bottom:17px;left:17px;color:#b7c1b3;font-size:11px;letter-spacing:1.4px}
+.stats-wrap{padding:0 0 45px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.stat{padding:22px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat-value{display:block;margin-bottom:5px;color:var(--green);font-size:clamp(22px,3vw,33px);font-weight:900}
+.stat-label{color:var(--muted);font-size:12px}
+.section{padding:48px 0}
+.section-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:24px}
+.section-kicker{margin-bottom:8px;color:var(--green);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+h2{margin:0;font-size:clamp(27px,4vw,39px);line-height:1.15;letter-spacing:-1px}
+.section-description{max-width:470px;color:var(--muted);font-size:13px}
+.progress-card{padding:20px;margin-bottom:20px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.progress-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;font-size:13px}
+.progress-top strong{color:var(--green)}
+.progress-track{height:9px;overflow:hidden;border-radius:50px;background:#293129}
+.progress-fill{width:0;height:100%;border-radius:50px;background:linear-gradient(90deg,#70df00,#c2ff7d);transition:width .3s}
+.progress-note{margin:11px 0 0;color:#899486;font-size:11px}
+.grid-panel{overflow:hidden;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.grid-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--line)}
+.toolbar-group{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.tool-btn{min-height:37px;padding:8px 12px;border:1px solid #354034;border-radius:7px;color:white;background:#192019;font-size:12px;font-weight:700}
+.tool-btn:hover{border-color:var(--green)}
+.zoom-value{color:#c1cabc;font-size:12px}
+.canvas-viewport{width:100%;height:460px;overflow:auto;overscroll-behavior:contain;background:#0c100c;scrollbar-color:#53614d #151a15}
+.canvas-stage{position:relative;width:20000px;height:20000px}
+#pixelCanvas,#gridOverlay{position:absolute;top:0;left:0;width:20000px;height:20000px}
+#pixelCanvas{display:block;max-width:none;cursor:crosshair;touch-action:none}
+#gridOverlay{pointer-events:none;background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(var(--cell-size) - 1px),#050505 calc(var(--cell-size) - 1px),#050505 var(--cell-size)),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--cell-size) - 1px),#050505 calc(var(--cell-size) - 1px),#050505 var(--cell-size))}
+.grid-footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:13px 15px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+.legend{display:flex;align-items:center;gap:8px}
+.legend-box{width:13px;height:13px;border:1px solid #000;background:var(--green)}
+.price-tag{color:var(--green);font-weight:800}
+.purchase-layout{display:grid;grid-template-columns:1fr .85fr;gap:20px;align-items:start}
+.card{padding:23px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.card h3{margin:0 0 7px;font-size:21px}
+.card-intro{margin:0 0 22px;color:var(--muted);font-size:13px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+.field label{color:#dce3d7;font-size:12px;font-weight:700}
+.field input,.field textarea{width:100%;min-width:0;padding:12px;border:1px solid #354034;border-radius:8px;outline:none;color:white;background:#0b0f0b;font-size:13px}
+.field input:focus,.field textarea:focus{border-color:var(--green)}
+.field textarea{min-height:90px;resize:vertical}
+#logoPreview{display:none;max-width:180px;max-height:140px;object-fit:contain;padding:6px;margin-top:8px;border-radius:8px;background:white}
+.summary{padding:18px;margin:20px 0;border:1px solid #33422c;border-radius:10px;background:#121a10}
+.summary-row{display:flex;justify-content:space-between;gap:12px;margin:9px 0;color:#c0c9ba;font-size:13px}
+.summary-row strong{color:white;text-align:right}
+.summary-total{padding-top:14px;margin-top:14px;border-top:1px solid #354332}
+.summary-total span,.summary-total strong{color:var(--green);font-size:23px;font-weight:900}
+.full-btn{width:100%}
+.fine-print{margin-top:13px;color:#8c9787;font-size:11px;line-height:1.7}
+#requestOutput{display:none;margin-top:15px;padding:14px;overflow-wrap:anywhere;white-space:pre-wrap;border:1px solid #354034;border-radius:8px;background:#0b0f0b;color:#dce3d7;font-size:12px;line-height:1.7}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:25px}
+.how-card{padding:22px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#141914,#0d100d)}
+.how-number{width:37px;height:37px;display:grid;place-items:center;margin-bottom:16px;border:1px solid #3e542f;border-radius:9px;color:var(--green);background:#192317;font-weight:900}
+.how-card h3{margin:0 0 8px;font-size:16px}
+.how-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
+.final-cta{padding:38px;border:1px solid #3a4d30;border-radius:16px;background:radial-gradient(ellipse at 90% 20%,#a5ff381f,transparent 45%),#111711}
+.final-cta h2{max-width:620px;margin-bottom:13px}
+.final-cta p{max-width:580px;margin:0 0 20px;color:#aeb9a7;font-size:14px}
+footer{margin-top:45px;border-top:1px solid var(--line)}
+.footer-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:24px 0;color:#818b7c;font-size:11px}
+@media(max-width:850px){
+ .hero-grid{grid-template-columns:1fr}
+ .hero-art{min-height:260px}
+ .purchase-layout{grid-template-columns:1fr}
+ .section-heading{align-items:start;flex-direction:column;gap:8px}
+}
+@media(max-width:600px){
+ .container{width:calc(100% - 24px)}
+ .brand{font-size:13px;gap:7px}
+ .brand-mark{width:31px;height:31px}
+ .nav-links{gap:0}
+ .nav-links a:not(.btn){display:none}
+ .nav-links .btn{min-height:37px;padding:8px 10px;font-size:11px}
+ .hero{padding:50px 0 40px}
+ h1{letter-spacing:-2px}
+ .hero-copy{font-size:15px}
+ .hero-art{min-height:230px}
+ .stats-wrap{padding-bottom:28px}
+ .stat{padding:14px 8px}
+ .stat-label{font-size:10px}
+ .section{padding:32px 0}
+ .canvas-viewport{height:360px}
+ .form-grid,.how-grid{grid-template-columns:1fr}
+ .field.full{grid-column:auto}
+ .card{padding:16px}
+ .final-cta{padding:24px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+<div class="container nav">
+<a class="brand" href="#inizio"><span class="brand-mark">M</span><span class="brand-name">Million Pixel <span>Italia</span></span></a>
+<nav class="nav-links">
+<a href="#progetto">Il progetto</a>
+<a href="#griglia">La griglia</a>
+<a href="#come-funziona">Come funziona</a>
+<a href="#griglia" class="btn btn-primary">Acquista pixel ↗</a>
+</nav>
+</div>
+</header>
+
+<main id="inizio">
+<section class="hero" id="progetto">
+<div class="container hero-grid">
+<div>
+<div class="eyebrow"><span class="dot"></span> Un progetto digitale italiano</div>
+<h1>Un milione di pixel.<br><span>Il tuo spazio.</span></h1>
+<p class="hero-copy">Un'idea semplice, uno spazio tutto da conquistare. Scegli i tuoi pixel, crea la tua presenza digitale e diventa parte di Million Pixel Italia.</p>
+<div class="hero-actions">
+<a class="btn btn-primary" href="#griglia">Scegli i tuoi pixel ↗</a>
+<a class="btn btn-secondary" href="#come-funziona">Scopri come funziona</a>
+</div>
+<p class="hero-note">1 pixel = 1 € · Puoi iniziare anche con un solo pixel</p>
+</div>
+<div class="hero-art">
+<div class="pixel-art" id="heroPixelArt"></div>
+<div class="art-label">ONE MILLION · ONE IDEA</div>
+</div>
+</div>
+</section>
+
+<section class="container stats-wrap">
+<div class="stats">
+<div class="stat"><span class="stat-value">1.000.000</span><span class="stat-label">Pixel totali nel progetto</span></div>
+<div class="stat"><span class="stat-value">1 €</span><span class="stat-label">Prezzo per ogni pixel</span></div>
+<div class="stat"><span class="stat-value" id="headerSelected">0</span><span class="stat-label">Pixel nella tua selezione</span></div>
+</div>
+</section>
+
+<section class="section" id="griglia">
+<div class="container">
+<div class="section-heading">
+<div><div class="section-kicker">Il cuore del progetto</div><h2>Ogni quadratino è un'opportunità.</h2></div>
+<p class="section-description">Esplora la griglia, scegli il tuo spazio e guarda il prezzo aggiornarsi in tempo reale. Anche un solo pixel conta.</p>
+</div>
+<div class="progress-card">
+<div class="progress-top"><span>La conquista del milione</span><strong id="progressLabel">0% completato</strong></div>
+<div class="progress-track" role="progressbar" aria-label="Avanzamento dei pixel venduti" aria-valuemin="0" aria-valuemax="1000000" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+<p class="progress-note">L'avanzamento delle vendite sarà aggiornato quando sarà attivo il sistema di registrazione degli acquisti. La selezione non è una vendita.</p>
+</div>
+<div class="grid-panel">
+<div class="grid-toolbar">
+<div class="toolbar-group">
+<button type="button" class="tool-btn" id="zoomOut">− Riduci</button>
+<button type="button" class="tool-btn" id="zoomIn">+ Ingrandisci</button>
+<span class="zoom-value">Quadratino: <strong id="zoomValue">20 px</strong></span>
+</div>
+<button type="button" class="tool-btn" id="clearSelection">Azzera selezione</button>
+</div>
+<div class="canvas-viewport" id="canvasViewport">
+<div class="canvas-stage" id="canvasStage">
+<canvas id="pixelCanvas" width="1000" height="1000"></canvas>
+<div id="gridOverlay" aria-hidden="true"></div>
+</div>
+</div>
+<div class="grid-footer">
+<div class="legend"><span class="legend-box"></span> Pixel selezionato</div>
+<span>Trascina per selezionare un rettangolo</span>
+<span class="price-tag">1 € / pixel</span>
+</div>
+</div>
+</div>
+</section>
+
+<section class="section" id="acquisto">
+<div class="container">
+<div class="section-heading">
+<div><div class="section-kicker">Il tuo spazio digitale</div><h2>Prepariamo la tua richiesta.</h2></div>
+<p class="section-description">Inserisci i tuoi dati e visualizza il riepilogo della selezione.</p>
+</div>
+<div class="purchase-layout">
+<div class="card">
+<h3>I tuoi dati</h3>
+<p class="card-intro">Per persone, marchi e aziende.</p>
+<form id="purchaseForm">
+<div class="form-grid">
+<div class="field"><label for="company">Nome o azienda *</label><input type="text" id="company" placeholder="Il tuo nome o marchio" required></div>
+<div class="field"><label for="email">Email *</label><input type="email" id="email" placeholder="nome@esempio.it" required></div>
+<div class="field full"><label for="website">Sito internet (facoltativo)</label><input type="url" id="website" placeholder="https://www.esempio.it"></div>
+<div class="field full"><label for="logo">Logo o immagine (facoltativo)</label><input type="file" id="logo" accept="image/*"><img id="logoPreview" alt="Anteprima del logo scelto"></div>
+<div class="field full"><label for="notes">Messaggio (facoltativo)</label><textarea id="notes" placeholder="Scrivi un breve messaggio..."></textarea></div>
+</div>
+<button type="submit" class="btn btn-primary full-btn" style="margin-top:20px">Procedi al pagamento ↗</button>
+<div id="requestOutput" aria-live="polite"></div>
+<p class="fine-print">Il pagamento viene elaborato da Stripe. I pixel saranno pubblicati soltanto dopo la conferma verificata del pagamento. Il logo selezionato è solo un'anteprima e non viene caricato sul server.</p>
+</form>
+</div>
+<aside class="card">
+<h3>Il tuo riepilogo</h3>
+<p class="card-intro">Il totale si aggiorna mentre scegli i pixel.</p>
+<div class="summary">
+<div class="summary-row"><span>Pixel selezionati</span><strong id="summaryPixels">0</strong></div>
+<div class="summary-row"><span>Prezzo per pixel</span><strong>1,00 €</strong></div>
+<div class="summary-row"><span>Dimensione della griglia</span><strong>1.000 × 1.000</strong></div>
+<div class="summary-row summary-total"><span>Totale</span><strong id="summaryPrice">0,00 €</strong></div>
+</div>
+<a href="#griglia" class="btn btn-secondary full-btn">Torna alla griglia ↑</a>
+<p class="fine-print">La selezione non riserva i pixel fino alla conferma del pagamento.</p>
+</aside>
+</div>
+</div>
+</section>
+
+<section class="section" id="come-funziona">
+<div class="container">
+<div class="section-heading">
+<div><div class="section-kicker">Semplice e diretto</div><h2>Come funziona.</h2></div>
+<p class="section-description">Un progetto costruito intorno a un'idea semplice: scegliere uno spazio, un pixel alla volta.</p>
+</div>
+<div class="how-grid">
+<article class="how-card"><div class="how-number">01</div><h3>Scegli il tuo spazio</h3><p>Seleziona un quadratino oppure trascina per scegliere un'area.</p></article>
+<article class="how-card"><div class="how-number">02</div><h3>Prepara la tua immagine</h3><p>Inserisci il tuo nome, i riferimenti e il logo che vorresti associare.</p></article>
+<article class="how-card"><div class="how-number">03</div><h3>Diventa parte del progetto</h3><p>Completa il pagamento per registrare il tuo spazio.</p></article>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="container">
+<div class="final-cta">
+<div class="section-kicker">Il tuo momento</div>
+<h2>Non serve un milione di pixel per lasciare il segno.</h2>
+<p>Puoi iniziare con uno solo. Il tuo spazio parte da 1 € per pixel.</p>
+<a href="#griglia" class="btn btn-primary">Scegli il tuo primo pixel ↗</a>
+</div>
+</div>
+</section>
+</main>
+
+<footer><div class="container footer-inner"><span>© Million Pixel Italia</span><span>Un pixel alla volta.</span><a href="#inizio">Torna all'inizio ↑</a></div></footer>
+
+<script>
+const GRID = 1000;
+const SUPABASE_URL = "https://rdrsqylyvgoafuzoljis.supabase.co";
+const SUPABASE_KEY = "sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
+const PRICE_PER_PIXEL = 1;
+
+const canvas = document.getElementById("pixelCanvas");
+const ctx = canvas.getContext("2d");
+const stage = document.getElementById("canvasStage");
+const gridOverlay = document.getElementById("gridOverlay");
+const selected = new Set();
+const occupied = new Set();
+
+let cellSize = 20;
+let dragging = false;
+let dragStart = null;
+let preview = null;
+
+function formatNumber(number) {
+  return number.toLocaleString("it-IT");
+}
+
+function formatEuro(number) {
+  return number.toLocaleString("it-IT", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function createHeroPixelArt() {
+  const art = document.getElementById("heroPixelArt");
+
+  for (let y = 0; y < 10; y++) {
+    for (let x = 0; x < 10; x++) {
+      const pixel = document.createElement("span");
+      const distance = Math.abs(x - 4.5) + Math.abs(y - 4.5);
+
+      if (
+        distance < 3 ||
+        (x === 2 && y > 2 && y < 7) ||
+        (x === 7 && y > 2 && y < 7) ||
+        (y === 2 && x > 2 && x < 7) ||
+        (y === 7 && x > 2 && x < 7)
+      ) {
+        pixel.classList.add("lit");
+      }
+
+      art.appendChild(pixel);
+    }
+  }
+}
+
+function updateCanvasSize() {
+  const size = GRID * cellSize;
+
+  stage.style.width = size + "px";
+  stage.style.height = size + "px";
+  canvas.style.width = size + "px";
+  canvas.style.height = size + "px";
+  gridOverlay.style.width = size + "px";
+  gridOverlay.style.height = size + "px";
+  gridOverlay.style.setProperty("--cell-size", cellSize + "px");
+
+  document.getElementById("zoomValue").textContent = cellSize + " px";
+  drawGrid();
+}
+
+function drawGrid() {
+  ctx.clearRect(0, 0, GRID, GRID);
+  ctx.fillStyle = "#252a30";
+  ctx.fillRect(0, 0, GRID, GRID);
+
+  ctx.fillStyle = "#687078";
+  for (const index of occupied) {
+    const x = index % GRID;
+    const y = Math.floor(index / GRID);
+    ctx.fillRect(x, y, 1, 1);
+  }
+
+  ctx.fillStyle = "#a5ff38";
+  for (const index of selected) {
+    const x = index % GRID;
+    const y = Math.floor(index / GRID);
+    ctx.fillRect(x, y, 1, 1);
+  }
+
+  if (preview) {
+    const left = Math.min(preview.x1, preview.x2);
+    const right = Math.max(preview.x1, preview.x2);
+    const top = Math.min(preview.y1, preview.y2);
+    const bottom = Math.max(preview.y1, preview.y2);
+
+    ctx.fillStyle = "rgba(165,255,56,0.45)";
+    ctx.fillRect(left, top, right - left + 1, bottom - top + 1);
+  }
+}
+
+async function loadOccupiedPixels() {
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/rpc/get_approved_pixel_positions`,
+      {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: "{}"
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Errore caricamento pixel:", await response.text());
+      return;
+    }
+
+    const positions = await response.json();
+    occupied.clear();
+
+    for (const position of positions) {
+      occupied.add(Number(position));
+    }
+
+    drawGrid();
+  } catch (error) {
+    console.error("Errore di connessione:", error);
+  }
+}
+
+function updateSummary() {
+  const count = selected.size;
+  const price = count * PRICE_PER_PIXEL;
+
+  document.getElementById("headerSelected").textContent = formatNumber(count);
+  document.getElementById("summaryPixels").textContent = formatNumber(count);
+  document.getElementById("summaryPrice").textContent = formatEuro(price);
+}
+
+function getCellFromPointer(event) {
+  const rect = canvas.getBoundingClientRect();
+
+  const x = Math.floor(((event.clientX - rect.left) / rect.width) * GRID);
+  const y = Math.floor(((event.clientY - rect.top) / rect.height) * GRID);
+
+  return {
+    x: Math.max(0, Math.min(GRID - 1, x)),
+    y: Math.max(0, Math.min(GRID - 1, y))
+  };
+}
+
+function addRectangleToSelection(rectangle) {
+  const left = Math.min(rectangle.x1, rectangle.x2);
+  const right = Math.max(rectangle.x1, rectangle.x2);
+  const top = Math.min(rectangle.y1, rectangle.y2);
+  const bottom = Math.max(rectangle.y1, rectangle.y2);
+
+  for (let y = top; y <= bottom; y++) {
+    for (let x = left; x <= right; x++) {
+      const index = y * GRID + x;
+
+      if (!occupied.has(index)) {
+        selected.add(index);
+      }
+    }
+  }
+}
+
+canvas.addEventListener("pointerdown", function(event) {
+  if (event.pointerType === "mouse" && event.button !== 0) return;
+
+  event.preventDefault();
+  const cell = getCellFromPointer(event);
+
+  dragging = true;
+  dragStart = cell;
+  preview = {
+    x1: cell.x,
+    y1: cell.y,
+    x2: cell.x,
+    y2: cell.y
+  };
+
+  canvas.setPointerCapture(event.pointerId);
+  drawGrid();
+});
+
+canvas.addEventListener("pointermove", function(event) {
+  if (!dragging || !dragStart) return;
+
+  const cell = getCellFromPointer(event);
+
+  preview = {
+    x1: dragStart.x,
+    y1: dragStart.y,
+    x2: cell.x,
+    y2: cell.y
+  };
+
+  drawGrid();
+});
+
+function finishSelection(event) {
+  if (!dragging || !dragStart) return;
+
+  const cell = getCellFromPointer(event);
+
+  addRectangleToSelection({
+    x1: dragStart.x,
+    y1: dragStart.y,
+    x2: cell.x,
+    y2: cell.y
+  });
+
+  dragging = false;
+  dragStart = null;
+  preview = null;
+
+  drawGrid();
+  updateSummary();
+}
+
+canvas.addEventListener("pointerup", finishSelection);
+
+canvas.addEventListener("pointercancel", function() {
+  dragging = false;
+  dragStart = null;
+  preview = null;
+  drawGrid();
+});
+
+document.getElementById("zoomIn").addEventListener("click", function() {
+  if (cellSize < 60) {
+    cellSize += 10;
+    updateCanvasSize();
+  }
+});
+
+document.getElementById("zoomOut").addEventListener("click", function() {
+  if (cellSize > 10) {
+    cellSize -= 10;
+    updateCanvasSize();
+  }
+});
+
+document.getElementById("clearSelection").addEventListener("click", function() {
+  selected.clear();
+  preview = null;
+  dragging = false;
+  dragStart = null;
+
+  drawGrid();
+  updateSummary();
+  document.getElementById("requestOutput").style.display = "none";
+});
+
+document.getElementById("logo").addEventListener("change", function() {
+  const file = this.files[0];
+  const image = document.getElementById("logoPreview");
+
+  if (!file) {
+    image.removeAttribute("src");
+    image.style.display = "none";
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    alert("Seleziona un file immagine valido.");
+    this.value = "";
+    image.style.display = "none";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+    image.src = event.target.result;
+    image.style.display = "block";
+  };
+
+  reader.readAsDataURL(file);
+});
+
+document.getElementById("purchaseForm").addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  if (selected.size === 0) {
+    alert("Seleziona almeno un pixel prima di continuare.");
+    document.getElementById("griglia").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
+  const company = document.getElementById("company").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const website = document.getElementById("website").value.trim();
+  const notes = document.getElementById("notes").value.trim();
+  const positions = Array.from(selected);
+
+  const output = document.getElementById("requestOutput");
+  const submitButton = this.querySelector('button[type="submit"]');
+
+  output.style.display = "block";
+  output.textContent = "Collegamento a Stripe in corso...";
+  submitButton.disabled = true;
+
+  try {
+    const response = await fetch(
+      SUPABASE_URL + "/functions/v1/create-checkout",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        },
+        body: JSON.stringify({
+          company_name: company,
+          email: email,
+          website_url: website,
+          message: notes,
+          pixel_positions: positions
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.error || "Errore durante la preparazione del pagamento."
+      );
+    }
+
+    if (!result.checkout_url) {
+      throw new Error("Stripe non ha restituito il link di pagamento.");
+    }
+
+    const checkoutUrl = new URL(result.checkout_url);
+
+    if (
+      checkoutUrl.protocol !== "https:" ||
+      checkoutUrl.hostname !== "checkout.stripe.com"
+    ) {
+      throw new Error("Indirizzo di pagamento Stripe non valido.");
+    }
+
+    output.textContent = "Apertura della pagina di pagamento...";
+    window.location.assign(checkoutUrl.href);
+
+  } catch (error) {
+    console.error("Errore checkout:", error);
+
+    output.textContent =
+      "Non è stato possibile aprire il pagamento. " +
+      (error instanceof Error ? error.message : "Errore di connessione.");
+
+    submitButton.disabled = false;
+  }
+});
+
+createHeroPixelArt();
+updateCanvasSize();
+updateSummary();
+loadOccupiedPixels();
+</script>
+</body>
+</html>

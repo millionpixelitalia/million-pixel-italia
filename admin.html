@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | Million Pixel Italia</title>
+<style>
+:root {
+  --bg:#080a0b;
+  --panel:#111519;
+  --green:#d5ff32;
+  --text:#f5f7f7;
+  --muted:#a5adb3;
+  --border:#2a3338;
+  --red:#ff8585;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; min-height:100vh; padding:24px;
+  background:var(--bg); color:var(--text);
+  font-family:Arial,sans-serif;
+}
+.wrap { max-width:1200px; margin:0 auto; }
+header {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; margin-bottom:35px;
+}
+.brand { font-size:22px; font-weight:800; }
+.brand span { color:var(--green); }
+.panel {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:14px; padding:24px; margin-bottom:20px;
+}
+h1 { font-size:clamp(26px,4vw,38px); }
+p { color:var(--muted); line-height:1.5; }
+label { display:block; margin:14px 0 7px; }
+input {
+  display:block; width:100%; padding:13px; color:white;
+  background:#080a0b; border:1px solid var(--border);
+  border-radius:8px; font-size:16px;
+}
+button {
+  padding:10px 14px; border:0; border-radius:8px;
+  background:var(--green); color:#101300;
+  font-weight:800; cursor:pointer;
+}
+button:disabled { opacity:.55; cursor:wait; }
+button.secondary {
+  color:white; background:#20272c; border:1px solid var(--border);
+}
+button.reject {
+  color:white; background:#6f252b; border:1px solid #a83b44;
+}
+.hidden { display:none !important; }
+.message { margin-top:15px; overflow-wrap:anywhere; }
+.error { color:var(--red); }
+.success { color:var(--green); }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:950px; }
+th,td {
+  text-align:left; padding:12px;
+  border-bottom:1px solid var(--border); vertical-align:top;
+}
+th { color:var(--green); }
+td { overflow-wrap:anywhere; }
+.actions { display:flex; gap:8px; flex-wrap:wrap; min-width:170px; }
+.status { font-weight:bold; }
+.status-pending { color:#ffd166; }
+.status-approved { color:var(--green); }
+.status-rejected { color:var(--red); }
+@media(max-width:600px) {
+  body { padding:14px; }
+  .panel { padding:16px; }
+  header { align-items:flex-start; flex-direction:column; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">MILLION PIXEL <span>ITALIA</span></div>
+    <button id="logoutBtn" class="secondary hidden" type="button">Esci</button>
+  </header>
+
+  <section id="loginPanel" class="panel">
+    <h1>Area amministratore</h1>
+    <p>Accedi per consultare e gestire le richieste del sito.</p>
+    <form id="loginForm">
+      <label for="email">Email amministratore</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <p><button id="loginBtn" type="submit">Accedi</button></p>
+    </form>
+    <div id="loginMessage" class="message" role="status"></div>
+  </section>
+
+  <section id="dashboard" class="hidden">
+    <div class="panel">
+      <h1>Richieste ricevute</h1>
+      <p>Controlla le richieste e scegli se concederle o rifiutarle. La conferma non incassa pagamenti e non assegna automaticamente i pixel.</p>
+      <button id="refreshBtn" type="button">Aggiorna richieste</button>
+      <div id="dashboardMessage" class="message" role="status"></div>
+    </div>
+    <div class="panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th><th>Cliente</th><th>Email</th>
+            <th>Pixel</th><th>Stato</th><th>Messaggio</th><th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="requestsBody">
+          <tr><td colspan="7">Accedi per caricare le richieste.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+const SUPABASE_URL = "https://rdrsqylyvgoafuzoljis.supabase.co";
+const SUPABASE_KEY = "sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
+
+const loginPanel = document.getElementById("loginPanel");
+const dashboard = document.getElementById("dashboard");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+const dashboardMessage = document.getElementById("dashboardMessage");
+const requestsBody = document.getElementById("requestsBody");
+const logoutBtn = document.getElementById("logoutBtn");
+const loginBtn = document.getElementById("loginBtn");
+
+let accessToken = null;
+
+function showMessage(element, text, isError = false) {
+  element.textContent = text;
+  element.className = "message " + (isError ? "error" : "success");
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(SUPABASE_URL + path, {
+    ...options,
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + (accessToken || SUPABASE_KEY),
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+
+  const text = await response.text();
+  let data;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+
+  if (!response.ok) {
+    const detail = data && data.msg ? data.msg :
+      data && data.message ? data.message : text;
+    throw new Error(detail || "Errore del server (" + response.status + ")");
+  }
+  return data;
+}
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  loginBtn.disabled = true;
+  showMessage(loginMessage, "Accesso in corso…");
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  try {
+    const result = await api("/auth/v1/token?grant_type=password", {
+      method: "POST",
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!result || !result.access_token) {
+      throw new Error("Supabase non ha restituito un token di accesso.");
+    }
+
+    accessToken = result.access_token;
+    sessionStorage.setItem("millionPixelAdminSession", JSON.stringify({
+      access_token: result.access_token,
+      expires_at: result.expires_at ||
+        Math.floor(Date.now() / 1000) + (result.expires_in || 3600)
+    }));
+
+    loginPanel.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+    logoutBtn.classList.remove("hidden");
+    await loadRequests();
+  } catch (error) {
+    showMessage(loginMessage,
+      "Accesso non riuscito: " + error.message, true);
+  } finally {
+    loginBtn.disabled = false;
+  }
+});
+
+function statusInfo(status) {
+  const s = String(status || "pending").toLowerCase();
+  if (["approved","confirmed","accepted"].includes(s)) {
+    return { label:"Concessa", css:"status-approved" };
+  }
+  if (["rejected","declined"].includes(s)) {
+    return { label:"Negata", css:"status-rejected" };
+  }
+  return { label:"In attesa", css:"status-pending" };
+}
+
+async function updateRequest(row, newStatus, button) {
+  const action = newStatus === "approved" ? "concedere" : "negare";
+  if (!confirm("Vuoi davvero " + action + " la richiesta di " +
+      (row.company_name || "questo cliente") + "?")) return;
+
+  button.disabled = true;
+  showMessage(dashboardMessage, "Aggiornamento della richiesta…");
+
+  try {
+    await api("/rest/v1/pixel_ads?id=eq." +
+      encodeURIComponent(row.id), {
+        method:"PATCH",
+        headers: { "Prefer":"return=minimal" },
+        body:JSON.stringify({ status:newStatus })
+      });
+
+    showMessage(dashboardMessage,
+      newStatus === "approved"
+        ? "Richiesta concessa."
+        : "Richiesta negata.");
+    await loadRequests();
+  } catch (error) {
+    showMessage(dashboardMessage,
+      "Non riesco ad aggiornare la richiesta: " + error.message, true);
+    button.disabled = false;
+  }
+}
+
+async function loadRequests() {
+  showMessage(dashboardMessage, "Caricamento richieste…");
+  requestsBody.replaceChildren();
+
+  try {
+    const rows = await api(
+      "/rest/v1/pixel_ads?select=id,company_name,email,website_url,message,pixel_count,status,created_at&order=created_at.desc"
+    );
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      requestsBody.innerHTML =
+        '<tr><td colspan="7">Non ci sono richieste da mostrare.</td></tr>';
+    } else {
+      for (const row of rows) {
+        const tr = document.createElement("tr");
+        const date = row.created_at
+          ? new Date(row.created_at).toLocaleString("it-IT") : "—";
+        const info = statusInfo(row.status);
+        const values = [
+          date,
+          row.company_name || "—",
+          row.email || "—",
+          String(row.pixel_count ?? 0),
+          info.label,
+          row.message || "—"
+        ];
+
+        for (let i = 0; i < values.length; i++) {
+          const td = document.createElement("td");
+          td.textContent = values[i];
+          if (i === 4) td.className = "status " + info.css;
+          tr.appendChild(td);
+        }
+
+        const actionCell = document.createElement("td");
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        if (String(row.status || "pending").toLowerCase() === "pending") {
+          const approveBtn = document.createElement("button");
+          approveBtn.type = "button";
+          approveBtn.textContent = "Concedi";
+          approveBtn.addEventListener("click", () =>
+            updateRequest(row, "approved", approveBtn));
+
+          const rejectBtn = document.createElement("button");
+          rejectBtn.type = "button";
+          rejectBtn.className = "reject";
+          rejectBtn.textContent = "Nega";
+          rejectBtn.addEventListener("click", () =>
+            updateRequest(row, "rejected", rejectBtn));
+
+          actions.append(approveBtn, rejectBtn);
+        } else {
+          const note = document.createElement("span");
+          note.textContent = "Già gestita";
+          actions.appendChild(note);
+        }
+
+        actionCell.appendChild(actions);
+        tr.appendChild(actionCell);
+        requestsBody.appendChild(tr);
+      }
+    }
+    showMessage(dashboardMessage, "Richieste caricate.");
+  } catch (error) {
+    showMessage(dashboardMessage,
+      "Non riesco a leggere le richieste: " + error.message, true);
+    requestsBody.innerHTML =
+      '<tr><td colspan="7">Controlla le autorizzazioni del database.</td></tr>';
+  }
+}
+
+document.getElementById("refreshBtn").addEventListener("click", loadRequests);
+
+logoutBtn.addEventListener("click", () => {
+  accessToken = null;
+  sessionStorage.removeItem("millionPixelAdminSession");
+  loginForm.reset();
+  dashboard.classList.add("hidden");
+  loginPanel.classList.remove("hidden");
+  logoutBtn.classList.add("hidden");
+  requestsBody.replaceChildren();
+  showMessage(loginMessage, "Hai effettuato la disconnessione.");
+});
+
+(async function restoreSession() {
+  try {
+    const saved = sessionStorage.getItem("millionPixelAdminSession");
+    if (!saved) return;
+    const session = JSON.parse(saved);
+    if (!session.access_token || !session.expires_at ||
+        session.expires_at * 1000 <= Date.now()) {
+      sessionStorage.removeItem("millionPixelAdminSession");
+      return;
+    }
+
+    accessToken = session.access_token;
+    const user = await api("/auth/v1/user");
+    if (!user || !user.id) return;
+
+    loginPanel.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+    logoutBtn.classList.remove("hidden");
+    await loadRequests();
+  } catch {
+    accessToken = null;
+    sessionStorage.removeItem("millionPixelAdminSession");
+  }
+})();
+</script>
+</body>
+</html>
