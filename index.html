@@ -27,6 +27,7 @@ button{cursor:pointer}
 .btn-primary{color:#10150b;background:var(--green)}
 .btn-primary:hover{background:#bdff79}
 .btn-secondary{color:white;background:#171d18;border-color:#394439}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
 .hero{padding:78px 0 55px;border-bottom:1px solid var(--line);background:radial-gradient(ellipse at 80% 25%,rgba(110,190,38,.13),transparent 40%),var(--bg)}
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:42px}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #34452a;border-radius:50px;color:var(--green);background:#11190e;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
@@ -86,6 +87,7 @@ h2{margin:0;font-size:clamp(27px,4vw,39px);line-height:1.15;letter-spacing:-1px}
 .field input:focus,.field textarea:focus{border-color:var(--green)}
 .field textarea{min-height:90px;resize:vertical}
 #logoPreview{display:none;max-width:180px;max-height:140px;object-fit:contain;padding:6px;margin-top:8px;border-radius:8px;background:white}
+.file-note{margin:2px 0 0;color:#899486;font-size:11px;line-height:1.6}
 .summary{padding:18px;margin:20px 0;border:1px solid #33422c;border-radius:10px;background:#121a10}
 .summary-row{display:flex;justify-content:space-between;gap:12px;margin:9px 0;color:#c0c9ba;font-size:13px}
 .summary-row strong{color:white;text-align:right}
@@ -221,15 +223,20 @@ footer{margin-top:45px;border-top:1px solid var(--line)}
 <p class="card-intro">Per persone, marchi e aziende.</p>
 <form id="purchaseForm">
 <div class="form-grid">
-<div class="field"><label for="company">Nome o azienda *</label><input type="text" id="company" placeholder="Il tuo nome o marchio" required></div>
-<div class="field"><label for="email">Email *</label><input type="email" id="email" placeholder="nome@esempio.it" required></div>
-<div class="field full"><label for="website">Sito internet (facoltativo)</label><input type="url" id="website" placeholder="https://www.esempio.it"></div>
-<div class="field full"><label for="logo">Logo o immagine (facoltativo)</label><input type="file" id="logo" accept="image/*"><img id="logoPreview" alt="Anteprima del logo scelto"></div>
-<div class="field full"><label for="notes">Messaggio (facoltativo)</label><textarea id="notes" placeholder="Scrivi un breve messaggio..."></textarea></div>
+<div class="field"><label for="company">Nome o azienda *</label><input type="text" id="company" placeholder="Il tuo nome o marchio" maxlength="200" required></div>
+<div class="field"><label for="email">Email *</label><input type="email" id="email" placeholder="nome@esempio.it" maxlength="320" required></div>
+<div class="field full"><label for="website">Sito internet (facoltativo)</label><input type="url" id="website" placeholder="https://www.esempio.it" maxlength="2048"></div>
+<div class="field full">
+<label for="logo">Logo o immagine (facoltativo, massimo 5 MB)</label>
+<input type="file" id="logo" accept="image/jpeg,image/png,image/webp,image/gif">
+<img id="logoPreview" alt="Anteprima del logo scelto">
+<p class="file-note">Formati ammessi: JPG, PNG, WEBP o GIF. Il logo sarà caricato prima di aprire il pagamento.</p>
+</div>
+<div class="field full"><label for="notes">Messaggio (facoltativo)</label><textarea id="notes" maxlength="2000" placeholder="Scrivi un breve messaggio..."></textarea></div>
 </div>
 <button type="submit" class="btn btn-primary full-btn" style="margin-top:20px">Procedi al pagamento ↗</button>
 <div id="requestOutput" aria-live="polite"></div>
-<p class="fine-print">Il pagamento viene elaborato da Stripe. I pixel saranno pubblicati soltanto dopo la conferma verificata del pagamento. Il logo selezionato è solo un'anteprima e non viene caricato sul server.</p>
+<p class="fine-print">Il pagamento viene elaborato da Stripe. I pixel saranno pubblicati soltanto dopo la conferma verificata del pagamento. Il logo viene caricato su Supabase Storage; la sua associazione all'ordine e la pubblicazione finale richiedono anche la configurazione del server.</p>
 </form>
 </div>
 <aside class="card">
@@ -280,6 +287,9 @@ footer{margin-top:45px;border-top:1px solid var(--line)}
 const GRID = 1000;
 const SUPABASE_URL = "https://rdrsqylyvgoafuzoljis.supabase.co";
 const SUPABASE_KEY = "sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
+const STORAGE_BUCKET = "pixel-images";
+const MAX_LOGO_BYTES = 5 * 1024 * 1024;
+const ALLOWED_LOGO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const PRICE_PER_PIXEL = 1;
 
 const canvas = document.getElementById("pixelCanvas");
@@ -446,6 +456,61 @@ function addRectangleToSelection(rectangle) {
   }
 }
 
+async function uploadLogo(file) {
+  if (!file) return null;
+
+  if (!ALLOWED_LOGO_TYPES.has(file.type)) {
+    throw new Error("Formato immagine non supportato. Usa JPG, PNG, WEBP o GIF.");
+  }
+
+  if (file.size > MAX_LOGO_BYTES) {
+    throw new Error("Il logo supera il limite di 5 MB. Scegli un'immagine più piccola.");
+  }
+
+  const extensionByType = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif"
+  };
+
+  const extension = extensionByType[file.type];
+  const randomPart = (typeof crypto !== "undefined" && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+  const imagePath = `pending/${randomPart}.${extension}`;
+  const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${imagePath}`;
+
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": file.type,
+      "Cache-Control": "3600",
+      "x-upsert": "false"
+    },
+    body: file
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    console.error("Errore upload logo:", details);
+
+    if (response.status === 400 || response.status === 403) {
+      throw new Error("Supabase non ha accettato il logo. Verifica che il bucket 'pixel-images' e la policy di caricamento siano configurati.");
+    }
+
+    throw new Error("Caricamento del logo non riuscito. Riprova.");
+  }
+
+  return {
+    image_path: imagePath,
+    image_url: `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${imagePath}`
+  };
+}
+
 canvas.addEventListener("pointerdown", function(event) {
   if (event.pointerType === "mouse" && event.button !== 0) return;
 
@@ -544,9 +609,18 @@ document.getElementById("logo").addEventListener("change", function() {
     return;
   }
 
-  if (!file.type.startsWith("image/")) {
-    alert("Seleziona un file immagine valido.");
+  if (!ALLOWED_LOGO_TYPES.has(file.type)) {
+    alert("Formato non valido. Seleziona JPG, PNG, WEBP o GIF.");
     this.value = "";
+    image.removeAttribute("src");
+    image.style.display = "none";
+    return;
+  }
+
+  if (file.size > MAX_LOGO_BYTES) {
+    alert("L'immagine supera il limite di 5 MB. Scegline una più piccola.");
+    this.value = "";
+    image.removeAttribute("src");
     image.style.display = "none";
     return;
   }
@@ -575,15 +649,24 @@ document.getElementById("purchaseForm").addEventListener("submit", async functio
   const website = document.getElementById("website").value.trim();
   const notes = document.getElementById("notes").value.trim();
   const positions = Array.from(selected);
+  const logoFile = document.getElementById("logo").files[0] || null;
 
   const output = document.getElementById("requestOutput");
   const submitButton = this.querySelector('button[type="submit"]');
 
   output.style.display = "block";
-  output.textContent = "Collegamento a Stripe in corso...";
   submitButton.disabled = true;
 
   try {
+    let logoInfo = null;
+
+    if (logoFile) {
+      output.textContent = "Caricamento del logo su Supabase in corso...";
+      logoInfo = await uploadLogo(logoFile);
+    }
+
+    output.textContent = "Preparazione del pagamento Stripe in corso...";
+
     const response = await fetch(
       SUPABASE_URL + "/functions/v1/create-checkout",
       {
@@ -598,7 +681,9 @@ document.getElementById("purchaseForm").addEventListener("submit", async functio
           email: email,
           website_url: website,
           message: notes,
-          pixel_positions: positions
+          pixel_positions: positions,
+          image_url: logoInfo ? logoInfo.image_url : null,
+          image_path: logoInfo ? logoInfo.image_path : null
         })
       }
     );
@@ -631,7 +716,7 @@ document.getElementById("purchaseForm").addEventListener("submit", async functio
     console.error("Errore checkout:", error);
 
     output.textContent =
-      "Non è stato possibile aprire il pagamento. " +
+      "Non è stato possibile proseguire. " +
       (error instanceof Error ? error.message : "Errore di connessione.");
 
     submitButton.disabled = false;
