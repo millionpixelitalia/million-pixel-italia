@@ -456,6 +456,7 @@ function addRectangleToSelection(rectangle) {
   }
 }
 
+/* CARICAMENTO LOGO: ora mostra il vero errore restituito da Supabase. */
 async function uploadLogo(file) {
   if (!file) return null;
 
@@ -475,6 +476,11 @@ async function uploadLogo(file) {
   };
 
   const extension = extensionByType[file.type];
+
+  if (!extension) {
+    throw new Error("Impossibile determinare il formato del logo.");
+  }
+
   const randomPart = (typeof crypto !== "undefined" && crypto.randomUUID)
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -482,27 +488,29 @@ async function uploadLogo(file) {
   const imagePath = `pending/${randomPart}.${extension}`;
   const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${imagePath}`;
 
-  const response = await fetch(uploadUrl, {
-    method: "POST",
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": file.type,
-      "Cache-Control": "3600",
-      "x-upsert": "false"
-    },
-    body: file
-  });
+  let response;
+
+  try {
+    response = await fetch(uploadUrl, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": file.type,
+        "Cache-Control": "3600",
+        "x-upsert": "false"
+      },
+      body: file
+    });
+  } catch (error) {
+    console.error("Errore di rete durante l'upload del logo:", error);
+    throw new Error("Il browser non riesce a contattare Supabase Storage. Controlla la connessione o le impostazioni CORS.");
+  }
 
   if (!response.ok) {
     const details = await response.text();
-    console.error("Errore upload logo:", details);
-
-    if (response.status === 400 || response.status === 403) {
-      throw new Error("Supabase non ha accettato il logo. Verifica che il bucket 'pixel-images' e la policy di caricamento siano configurati.");
-    }
-
-    throw new Error("Caricamento del logo non riuscito. Riprova.");
+    console.error("Errore upload logo:", response.status, details);
+    throw new Error(`Caricamento logo fallito (${response.status}): ${details || response.statusText}`);
   }
 
   return {
@@ -688,12 +696,20 @@ document.getElementById("purchaseForm").addEventListener("submit", async functio
       }
     );
 
-    const result = await response.json();
+    /* Legge anche gli errori non JSON restituiti dal server. */
+    const responseText = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(responseText);
+    } catch {
+      throw new Error(
+        `Risposta non valida dal server (${response.status}): ${responseText.slice(0, 500)}`
+      );
+    }
 
     if (!response.ok) {
-      throw new Error(
-        result.error || "Errore durante la preparazione del pagamento."
-      );
+      throw new Error(result.error || `Errore del server (${response.status}).`);
     }
 
     if (!result.checkout_url) {
