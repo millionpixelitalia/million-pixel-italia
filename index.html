@@ -6,7 +6,14 @@
 <meta name="theme-color" content="#090b0a">
 <title>Million Pixel Italia</title>
 <style>
-:root{--bg:#090b0a;--surface:#111511;--green:#a5ff38;--white:#f5f7f2;--muted:#a2aaa0;--line:#293129}
+:root {
+  --bg:#090b0a;
+  --surface:#111511;
+  --green:#a5ff38;
+  --white:#f5f7f2;
+  --muted:#a2aaa0;
+  --line:#293129;
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:85px}
 body{margin:0;background:var(--bg);color:var(--white);font-family:Arial,Helvetica,sans-serif;line-height:1.5}
@@ -65,9 +72,21 @@ h2{margin:0;font-size:clamp(27px,4vw,39px);line-height:1.15;letter-spacing:-1px}
 .zoom-value{color:#c1cabc;font-size:12px}
 .canvas-viewport{position:relative;width:100%;height:460px;overflow:auto;overscroll-behavior:contain;background:#0c100c;scrollbar-color:#53614d #151a15}
 .canvas-stage{position:relative;width:20000px;height:20000px}
-#pixelCanvas,#gridOverlay{position:absolute;top:0;left:0;width:20000px;height:20000px}
+#pixelCanvas,#gridOverlay,#pixelLogoLayer{position:absolute;top:0;left:0;width:20000px;height:20000px}
 #pixelCanvas{display:block;max-width:none;cursor:crosshair;touch-action:none}
-#gridOverlay{pointer-events:none}
+#gridOverlay,#pixelLogoLayer{pointer-events:none}
+#pixelLogoLayer{z-index:5;overflow:visible}
+.pixel-logo-anchor{
+  position:absolute;z-index:5;
+  width:clamp(42px,calc(var(--cell-size)*3.2),84px);
+  height:clamp(34px,calc(var(--cell-size)*2.5),64px);
+  display:flex;align-items:center;justify-content:center;
+  padding:3px;border:1px solid var(--green);border-radius:5px;
+  background:#090b0af2;box-shadow:0 0 10px #a5ff3855;
+  pointer-events:none;overflow:hidden;
+}
+.pixel-logo-anchor img{display:block;width:100%;height:100%;object-fit:contain}
+.pixel-logo-anchor .anchor-fallback{color:var(--green);font-size:9px;font-weight:900;text-align:center;overflow-wrap:anywhere}
 .logo-tooltip{display:none;position:absolute;z-index:50;width:230px;max-width:calc(100% - 16px);padding:12px;border:1px solid var(--green);border-radius:10px;background:#101610;box-shadow:0 10px 35px #000b;pointer-events:none}
 .logo-tooltip img{display:block;width:100%;height:120px;object-fit:contain;border-radius:6px;background:#fff;margin-bottom:9px}
 .tooltip-company{font-size:14px;font-weight:800;color:var(--green);overflow-wrap:anywhere}
@@ -111,7 +130,6 @@ footer{margin-top:40px;border-top:1px solid var(--line)}
 @media(max-width:600px){.container{width:calc(100% - 24px)}.brand{font-size:13px;gap:7px}.brand-mark{width:31px;height:31px}.nav-links{gap:0}.nav-links a:not(.btn){display:none}.nav-links .btn{min-height:37px;padding:8px 10px;font-size:11px}.hero{padding:45px 0 35px}h1{letter-spacing:-2px}.stats-wrap{padding-bottom:25px}.stat{padding:13px 8px}.stat-label{font-size:10px}.section{padding:30px 0}.canvas-viewport{height:360px}.form-grid,.how-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.card{padding:16px}.final-cta{padding:22px}}
 </style>
 </head>
-
 <body>
 <header class="topbar">
   <div class="container nav">
@@ -153,20 +171,22 @@ footer{margin-top:40px;border-top:1px solid var(--line)}
     <div><div class="section-kicker">Il cuore del progetto</div><h2>Ogni quadratino è un'opportunità.</h2></div>
     <p class="section-description">Esplora la griglia, scegli il tuo spazio e guarda il prezzo aggiornarsi in tempo reale. Anche un solo pixel conta.</p>
   </div>
-
   <div class="progress-card">
     <div class="progress-top"><span>La conquista del milione</span><strong id="progressLabel">Caricamento vendite...</strong></div>
     <div class="progress-track" id="progressBar" role="progressbar" aria-label="Avanzamento dei pixel venduti" aria-valuemin="0" aria-valuemax="1000000" aria-valuenow="0"><div class="progress-fill" id="progressFill"></div></div>
     <p class="progress-note" id="progressNote">Recupero degli annunci approvati in corso.</p>
   </div>
-
   <div class="grid-panel">
     <div class="grid-toolbar">
       <div class="toolbar-group"><button type="button" class="tool-btn" id="zoomOut">− Riduci</button><button type="button" class="tool-btn" id="zoomIn">+ Ingrandisci</button><span class="zoom-value">Quadratino: <strong id="zoomValue">20 px</strong></span></div>
       <button type="button" class="tool-btn" id="clearSelection">Azzera selezione</button>
     </div>
     <div class="canvas-viewport" id="canvasViewport">
-      <div class="canvas-stage" id="canvasStage"><canvas id="pixelCanvas" width="1000" height="1000"></canvas><div id="gridOverlay"></div></div>
+      <div class="canvas-stage" id="canvasStage">
+        <canvas id="pixelCanvas" width="1000" height="1000"></canvas>
+        <div id="gridOverlay"></div>
+        <div id="pixelLogoLayer" aria-label="Anteprime dei loghi acquistati"></div>
+      </div>
       <div class="logo-tooltip" id="logoTooltip"><img id="tooltipLogo" alt="Logo dell'azienda"><div class="tooltip-company" id="tooltipCompany"></div><div class="tooltip-position" id="tooltipPosition"></div></div>
     </div>
     <div class="grid-footer"><div class="legend"><span class="legend-box"></span> Pixel selezionato</div><span>Trascina per selezionare un rettangolo</span><span class="price-tag">1 € / pixel</span></div>
@@ -215,352 +235,249 @@ footer{margin-top:40px;border-top:1px solid var(--line)}
 
 <section class="section"><div class="container"><div class="final-cta"><div class="section-kicker">Il tuo momento</div><h2>Non serve un milione di pixel per lasciare il segno.</h2><p>Puoi iniziare con uno solo. Il tuo spazio parte da 1 € per pixel.</p><a href="#griglia" class="btn btn-primary">Scegli il tuo primo pixel ↗</a></div></div></section>
 </main>
-
 <footer><div class="container footer-inner"><span>© Million Pixel Italia</span><span>Un pixel alla volta.</span><a href="#inizio">Torna all'inizio ↑</a></div></footer>
 
 <script>
 "use strict";
 
-const GRID = 1000;
-const TOTAL_PIXELS = GRID * GRID;
-const PRICE_PER_PIXEL = 1;
-const SUPABASE_URL = "https://rdrsqylyvgoafuzoljis.supabase.co";
-const SUPABASE_KEY = "sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
-const STORAGE_BUCKET = "pixel-images";
-const MAX_LOGO_BYTES = 5 * 1024 * 1024;
-const ALLOWED_LOGO_TYPES = new Set(["image/jpeg","image/png","image/webp","image/gif"]);
+const GRID=1000;
+const TOTAL_PIXELS=GRID*GRID;
+const PRICE_PER_PIXEL=1;
+const SUPABASE_URL="https://rdrsqylyvgoafuzoljis.supabase.co";
+const SUPABASE_KEY="sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
+const STORAGE_BUCKET="pixel-images";
+const MAX_LOGO_BYTES=5*1024*1024;
+const ALLOWED_LOGO_TYPES=new Set(["image/jpeg","image/png","image/webp","image/gif"]);
 
-const canvas = document.getElementById("pixelCanvas");
-const ctx = canvas.getContext("2d");
-const stage = document.getElementById("canvasStage");
-const gridOverlay = document.getElementById("gridOverlay");
-const viewport = document.getElementById("canvasViewport");
-const logoTooltip = document.getElementById("logoTooltip");
-const tooltipLogo = document.getElementById("tooltipLogo");
-const tooltipCompany = document.getElementById("tooltipCompany");
-const tooltipPosition = document.getElementById("tooltipPosition");
+const canvas=document.getElementById("pixelCanvas");
+const ctx=canvas.getContext("2d");
+const stage=document.getElementById("canvasStage");
+const gridOverlay=document.getElementById("gridOverlay");
+const pixelLogoLayer=document.getElementById("pixelLogoLayer");
+const viewport=document.getElementById("canvasViewport");
+const logoTooltip=document.getElementById("logoTooltip");
+const tooltipLogo=document.getElementById("tooltipLogo");
+const tooltipCompany=document.getElementById("tooltipCompany");
+const tooltipPosition=document.getElementById("tooltipPosition");
 
-const selected = new Set();
-const occupied = new Set();
+const selected=new Set();
+const occupied=new Set();
+let approvedAds=[];
+let cellSize=20;
+let dragging=false;
+let dragStart=null;
+let preview=null;
 
-let approvedAds = [];
-let cellSize = 20;
-let dragging = false;
-let dragStart = null;
-let preview = null;
+function formatNumber(n){return n.toLocaleString("it-IT")}
+function formatEuro(n){return n.toLocaleString("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2})}
 
-function formatNumber(n) {
-  return n.toLocaleString("it-IT");
-}
-
-function formatEuro(n) {
-  return n.toLocaleString("it-IT", {
-    style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2
-  });
-}
-
-function createHeroPixelArt() {
-  const art = document.getElementById("heroPixelArt");
-  for (let y=0;y<10;y++) {
-    for (let x=0;x<10;x++) {
+function createHeroPixelArt(){
+  const art=document.getElementById("heroPixelArt");
+  for(let y=0;y<10;y++){
+    for(let x=0;x<10;x++){
       const p=document.createElement("span");
       const d=Math.abs(x-4.5)+Math.abs(y-4.5);
-      if (d<3||(x===2&&y>2&&y<7)||(x===7&&y>2&&y<7)||(y===2&&x>2&&x<7)||(y===7&&x>2&&x<7)) p.classList.add("lit");
+      if(d<3||(x===2&&y>2&&y<7)||(x===7&&y>2&&y<7)||(y===2&&x>2&&x<7)||(y===7&&x>2&&x<7))p.classList.add("lit");
       art.appendChild(p);
     }
   }
 }
 
-function updateCanvasSize() {
+function updateCanvasSize(){
   const size=GRID*cellSize;
   stage.style.width=size+"px";
   stage.style.height=size+"px";
-  canvas.style.width=size+"px";
-  canvas.style.height=size+"px";
-  gridOverlay.style.width=size+"px";
-  gridOverlay.style.height=size+"px";
+  for(const el of [canvas,gridOverlay,pixelLogoLayer]){
+    el.style.width=size+"px";
+    el.style.height=size+"px";
+  }
+  pixelLogoLayer.style.setProperty("--cell-size",cellSize+"px");
   gridOverlay.style.backgroundImage=
     `repeating-linear-gradient(to right,transparent 0,transparent calc(${cellSize}px - 1px),#050505 calc(${cellSize}px - 1px),#050505 ${cellSize}px),repeating-linear-gradient(to bottom,transparent 0,transparent calc(${cellSize}px - 1px),#050505 calc(${cellSize}px - 1px),#050505 ${cellSize}px)`;
   document.getElementById("zoomValue").textContent=cellSize+" px";
+  renderLogoAnchors();
   drawGrid();
 }
 
-function updateSalesProgress() {
-  /*
-   * Conteggio delle POSIZIONI UNICHE effettivamente restituite
-   * dagli annunci approvati. Non si usa selected.size.
-   */
+function updateSalesProgress(){
   const sold=occupied.size;
   const percentage=sold/TOTAL_PIXELS*100;
-  const percentageText=percentage.toLocaleString("it-IT",{
-    minimumFractionDigits:4,
-    maximumFractionDigits:4
-  });
-
-  document.getElementById("progressLabel").textContent=
-    `${formatNumber(sold)} pixel venduti · ${percentageText}%`;
-  document.getElementById("progressFill").style.width=
-    Math.min(100,percentage)+"%";
+  const percentageText=percentage.toLocaleString("it-IT",{minimumFractionDigits:4,maximumFractionDigits:4});
+  document.getElementById("progressLabel").textContent=`${formatNumber(sold)} pixel venduti · ${percentageText}%`;
+  document.getElementById("progressFill").style.width=Math.min(100,percentage)+"%";
   document.getElementById("progressBar").setAttribute("aria-valuenow",String(sold));
-  document.getElementById("progressNote").textContent=
-    `${formatNumber(sold)} / ${formatNumber(TOTAL_PIXELS)} pixel venduti`;
-
-  return sold;
+  document.getElementById("progressNote").textContent=`${formatNumber(sold)} / ${formatNumber(TOTAL_PIXELS)} pixel venduti`;
 }
 
-function updateSummary() {
+function updateSummary(){
   const count=selected.size;
   document.getElementById("headerSelected").textContent=formatNumber(count);
   document.getElementById("summaryPixels").textContent=formatNumber(count);
   document.getElementById("summaryPrice").textContent=formatEuro(count*PRICE_PER_PIXEL);
 }
 
-function getAdBounds(positions) {
-  if (!positions.length) return null;
+function getAdBounds(positions){
+  if(!positions.length)return null;
   let minX=GRID,minY=GRID,maxX=-1,maxY=-1;
-  for (const index of positions) {
-    const x=index%GRID;
-    const y=Math.floor(index/GRID);
-    minX=Math.min(minX,x);
-    minY=Math.min(minY,y);
-    maxX=Math.max(maxX,x);
-    maxY=Math.max(maxY,y);
+  for(const index of positions){
+    const x=index%GRID,y=Math.floor(index/GRID);
+    minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);
   }
-  return {x:minX,y:minY,width:maxX-minX+1,height:maxY-minY+1};
+  return{x:minX,y:minY,width:maxX-minX+1,height:maxY-minY+1};
 }
 
-function findApprovedAdAt(index) {
+function findApprovedAdAt(index){
   return approvedAds.find(ad=>ad.positions.includes(index))||null;
 }
 
-function hideLogoTooltip() {
-  logoTooltip.style.display="none";
-}
+function hideLogoTooltip(){logoTooltip.style.display="none"}
 
-function showLogoTooltip(ad,event,index) {
-  if (!ad) {
-    hideLogoTooltip();
-    return;
-  }
-
+function showLogoTooltip(ad,event,index){
+  if(!ad){hideLogoTooltip();return}
   tooltipCompany.textContent=ad.company_name||"Azienda";
   tooltipPosition.textContent="Pixel occupato · "+formatNumber(index+1);
-
-  if (ad.image_url) {
+  if(ad.image_url){
     tooltipLogo.src=ad.image_url;
     tooltipLogo.style.display="block";
-  } else {
+  }else{
     tooltipLogo.removeAttribute("src");
     tooltipLogo.style.display="none";
   }
-
   logoTooltip.style.display="block";
-
   const rect=viewport.getBoundingClientRect();
-  const minLeft=viewport.scrollLeft+6;
-  const minTop=viewport.scrollTop+6;
+  const minLeft=viewport.scrollLeft+6,minTop=viewport.scrollTop+6;
   const maxLeft=Math.max(minLeft,viewport.scrollLeft+viewport.clientWidth-logoTooltip.offsetWidth-8);
   const maxTop=Math.max(minTop,viewport.scrollTop+viewport.clientHeight-logoTooltip.offsetHeight-8);
-
   let left=event.clientX-rect.left+viewport.scrollLeft+14;
   let top=event.clientY-rect.top+viewport.scrollTop+14;
-
-  if (left>maxLeft) left-=logoTooltip.offsetWidth+28;
-  if (top>maxTop) top-=logoTooltip.offsetHeight+28;
-
+  if(left>maxLeft)left-=logoTooltip.offsetWidth+28;
+  if(top>maxTop)top-=logoTooltip.offsetHeight+28;
   logoTooltip.style.left=Math.max(minLeft,Math.min(left,maxLeft))+"px";
   logoTooltip.style.top=Math.max(minTop,Math.min(top,maxTop))+"px";
 }
 
-/*
- * I loghi vengono disegnati sempre, non solo al passaggio del mouse.
- * Gli annunci grandi usano il proprio rettangolo. Gli annunci da
- * un pixel ricevono una miniatura DOM ancorata alla cella: non
- * si altera il numero di pixel registrati come venduti.
- */
-function drawApprovedAdLogo(ad) {
-  if (!ad.image || !ad.image.complete ||
-      !ad.image.naturalWidth || !ad.image.naturalHeight) return;
-
+/* I loghi grandi vengono disegnati nella propria area soltanto
+   quando le posizioni formano un rettangolo pieno. */
+function drawApprovedAdLogo(ad){
+  if(!ad.image||!ad.image.complete||!ad.image.naturalWidth||!ad.image.naturalHeight)return;
+  if(ad.positions.length<2)return;
   const bounds=getAdBounds(ad.positions);
-  if (!bounds) return;
-
-  if (ad.positions.length===1) {
-    /*
-     * Un solo pixel non può contenere un logo leggibile.
-     * La miniatura viene gestita separatamente dalla griglia.
-     */
-    return;
-  }
+  if(!bounds||bounds.width*bounds.height!==ad.positions.length)return;
 
   ctx.save();
   ctx.beginPath();
-
-  for (const index of ad.positions) {
-    ctx.rect(index%GRID,Math.floor(index/GRID),1,1);
-  }
-
+  for(const index of ad.positions)ctx.rect(index%GRID,Math.floor(index/GRID),1,1);
   ctx.clip();
-  ctx.fillStyle="#111711";
+  ctx.fillStyle="#0d120c";
+  ctx.fillRect(bounds.x,bounds.y,bounds.width,bounds.height);
 
-  for (const index of ad.positions) {
-    ctx.fillRect(index%GRID,Math.floor(index/GRID),1,1);
-  }
-
-  const scale=Math.min(
-    bounds.width/ad.image.naturalWidth,
-    bounds.height/ad.image.naturalHeight
-  );
-
-  const w=ad.image.naturalWidth*scale;
-  const h=ad.image.naturalHeight*scale;
-  const x=bounds.x+(bounds.width-w)/2;
-  const y=bounds.y+(bounds.height-h)/2;
-
+  const scale=Math.min(bounds.width/ad.image.naturalWidth,bounds.height/ad.image.naturalHeight);
+  const w=ad.image.naturalWidth*scale,h=ad.image.naturalHeight*scale;
+  const x=bounds.x+(bounds.width-w)/2,y=bounds.y+(bounds.height-h)/2;
   ctx.imageSmoothingEnabled=true;
   ctx.imageSmoothingQuality="high";
   ctx.drawImage(ad.image,x,y,w,h);
   ctx.restore();
 }
 
-/*
- * Miniature permanenti per annunci da un pixel.
- * Sono posizionate in un pannello sopra la griglia, così non
- * nascondono le celle né falsificano la superficie acquistata.
- */
-function updateSinglePixelShowcase() {
-  let showcase=document.getElementById("singlePixelShowcase");
+/* Mini-logo sempre visibile, ancorato al centro della cella venduta. */
+function renderLogoAnchors(){
+  pixelLogoLayer.replaceChildren();
 
-  if (!showcase) {
-    showcase=document.createElement("div");
-    showcase.id="singlePixelShowcase";
-    showcase.style.cssText=
-      "display:flex;flex-wrap:wrap;gap:10px;padding:12px;border-bottom:1px solid #293129;background:#0d110d;";
+  for(const ad of approvedAds){
+    if(ad.positions.length!==1)continue;
+    const index=ad.positions[0];
+    const x=index%GRID,y=Math.floor(index/GRID);
+    const anchor=document.createElement("div");
+    anchor.className="pixel-logo-anchor";
+    anchor.style.left=(x*cellSize+cellSize/2)+"px";
+    anchor.style.top=(y*cellSize+cellSize/2)+"px";
+    anchor.style.transform="translate(-50%,-50%)";
+    anchor.title=`${ad.company_name} · 1 pixel`;
+    anchor.setAttribute("aria-label",`Annuncio ${ad.company_name}, pixel ${index+1}`);
 
-    const toolbar=document.querySelector(".grid-toolbar");
-    toolbar.insertAdjacentElement("afterend",showcase);
-  }
-
-  showcase.replaceChildren();
-
-  const singlePixelAds=approvedAds.filter(ad=>ad.positions.length===1&&ad.image_url);
-
-  if (!singlePixelAds.length) {
-    showcase.style.display="none";
-    return;
-  }
-
-  showcase.style.display="flex";
-
-  const title=document.createElement("div");
-  title.textContent="ANNUNCI · PIXEL SINGOLI";
-  title.style.cssText="width:100%;color:#a5ff38;font-size:10px;font-weight:800;letter-spacing:1.5px;";
-  showcase.appendChild(title);
-
-  for (const ad of singlePixelAds) {
-    const card=document.createElement("div");
-    card.title=ad.company_name;
-    card.style.cssText=
-      "width:92px;min-height:75px;padding:7px;border:1px solid #354034;border-radius:8px;background:#111711;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;";
-
-    const img=document.createElement("img");
-    img.src=ad.image_url;
-    img.alt=ad.company_name;
-    img.loading="lazy";
-    img.style.cssText="width:76px;height:42px;object-fit:contain;background:#fff;border-radius:4px;";
-
-    const name=document.createElement("span");
-    name.textContent=ad.company_name;
-    name.style.cssText="max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a5ff38;font-size:10px;font-weight:700;";
-
-    card.append(img,name);
-    showcase.appendChild(card);
+    if(ad.image_url){
+      const img=document.createElement("img");
+      img.src=ad.image_url;
+      img.alt=ad.company_name||"Logo";
+      img.draggable=false;
+      anchor.appendChild(img);
+    }else{
+      const fallback=document.createElement("span");
+      fallback.className="anchor-fallback";
+      fallback.textContent=(ad.company_name||"M").slice(0,12);
+      anchor.appendChild(fallback);
+    }
+    pixelLogoLayer.appendChild(anchor);
   }
 }
 
-function drawGrid() {
+function drawGrid(){
   ctx.clearRect(0,0,GRID,GRID);
-  ctx.fillStyle="#252a30";
+  ctx.fillStyle="#20272b";
   ctx.fillRect(0,0,GRID,GRID);
 
-  ctx.fillStyle="#687078";
-  for (const index of occupied) {
-    ctx.fillRect(index%GRID,Math.floor(index/GRID),1,1);
+  for(const index of occupied){
+    const x=index%GRID,y=Math.floor(index/GRID);
+    ctx.fillStyle="#172018";
+    ctx.fillRect(x,y,1,1);
+    ctx.strokeStyle="#5d8b35";
+    ctx.lineWidth=.08;
+    ctx.strokeRect(x+.04,y+.04,.92,.92);
   }
 
-  for (const ad of approvedAds) {
-    drawApprovedAdLogo(ad);
-  }
+  for(const ad of approvedAds)drawApprovedAdLogo(ad);
 
   ctx.fillStyle="#a5ff38";
-  for (const index of selected) {
-    ctx.fillRect(index%GRID,Math.floor(index/GRID),1,1);
-  }
+  for(const index of selected)ctx.fillRect(index%GRID,Math.floor(index/GRID),1,1);
 
-  if (preview) {
-    const left=Math.min(preview.x1,preview.x2);
-    const right=Math.max(preview.x1,preview.x2);
-    const top=Math.min(preview.y1,preview.y2);
-    const bottom=Math.max(preview.y1,preview.y2);
-    ctx.fillStyle="rgba(165,255,56,0.45)";
+  if(preview){
+    const left=Math.min(preview.x1,preview.x2),right=Math.max(preview.x1,preview.x2);
+    const top=Math.min(preview.y1,preview.y2),bottom=Math.max(preview.y1,preview.y2);
+    ctx.fillStyle="rgba(165,255,56,.45)";
     ctx.fillRect(left,top,right-left+1,bottom-top+1);
   }
 }
 
-async function loadOccupiedPixels() {
+async function loadOccupiedPixels(){
   const label=document.getElementById("progressLabel");
   const note=document.getElementById("progressNote");
   label.textContent="Caricamento vendite...";
   note.textContent="Recupero degli annunci approvati in corso.";
 
-  try {
-    const response=await fetch(
-      `${SUPABASE_URL}/rest/v1/rpc/get_approved_pixel_ads`,
-      {
-        method:"POST",
-        headers:{
-          apikey:SUPABASE_KEY,
-          Authorization:`Bearer ${SUPABASE_KEY}`,
-          "Content-Type":"application/json"
-        },
-        body:"{}"
-      }
-    );
+  try{
+    const response=await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_approved_pixel_ads`,{
+      method:"POST",
+      headers:{
+        apikey:SUPABASE_KEY,
+        Authorization:`Bearer ${SUPABASE_KEY}`,
+        "Content-Type":"application/json"
+      },
+      body:"{}"
+    });
 
-    if (!response.ok) {
-      const detail=await response.text();
-      console.error("RPC get_approved_pixel_ads:",response.status,detail);
+    if(!response.ok){
+      console.error("RPC get_approved_pixel_ads:",response.status,await response.text());
       label.textContent="Conteggio non disponibile";
       note.textContent="Errore nel recupero degli annunci. Controlla la funzione Supabase.";
       return;
     }
 
     const ads=await response.json();
-
-    if (!Array.isArray(ads)) {
-      throw new Error("La funzione Supabase non ha restituito un elenco di annunci.");
-    }
+    if(!Array.isArray(ads))throw new Error("La funzione Supabase non ha restituito un elenco di annunci.");
 
     occupied.clear();
     approvedAds=[];
 
-    for (const ad of ads) {
+    for(const ad of ads){
       let positions=ad.pixel_positions;
-
-      if (typeof positions==="string") {
-        try { positions=JSON.parse(positions); }
-        catch { positions=[]; }
+      if(typeof positions==="string"){
+        try{positions=JSON.parse(positions)}catch{positions=[]}
       }
+      if(!Array.isArray(positions))positions=[];
 
-      if (!Array.isArray(positions)) positions=[];
-
-      const normalized=[...new Set(
-        positions.map(Number).filter(
-          n=>Number.isInteger(n)&&n>=0&&n<TOTAL_PIXELS
-        )
-      )];
-
-      if (!normalized.length) continue;
+      const normalized=[...new Set(positions.map(Number).filter(n=>Number.isInteger(n)&&n>=0&&n<TOTAL_PIXELS))];
+      if(!normalized.length)continue;
 
       const item={
         company_name:ad.company_name||"Azienda",
@@ -568,87 +485,56 @@ async function loadOccupiedPixels() {
         positions:normalized,
         image:null
       };
-
       approvedAds.push(item);
-
-      for (const position of normalized) {
-        occupied.add(position);
-      }
+      for(const position of normalized)occupied.add(position);
     }
 
-    /*
-     * Conteggio univoco: se due righe riportano la stessa posizione,
-     * quella cella viene conteggiata una volta sola.
-     */
+    /* Conta posizioni uniche approvate, non la selezione del visitatore. */
     updateSalesProgress();
 
     await Promise.all(approvedAds.map(ad=>new Promise(resolve=>{
-      if (!ad.image_url) {
-        resolve();
-        return;
-      }
-
+      if(!ad.image_url){resolve();return}
       const img=new Image();
-
-      img.onload=()=>{
-        ad.image=img;
-        drawGrid();
-        resolve();
-      };
-
-      img.onerror=()=>{
-        console.error("Impossibile caricare il logo:",ad.company_name,ad.image_url);
-        resolve();
-      };
-
+      img.onload=()=>{ad.image=img;resolve()};
+      img.onerror=()=>{console.error("Impossibile caricare il logo:",ad.company_name,ad.image_url);resolve()};
       img.src=ad.image_url;
     })));
 
+    renderLogoAnchors();
     drawGrid();
     updateSummary();
-    updateSinglePixelShowcase();
-
-  } catch (error) {
+  }catch(error){
     console.error("Errore caricamento vendite:",error);
     label.textContent="Conteggio non disponibile";
     note.textContent="Impossibile leggere i dati degli annunci approvati da Supabase.";
   }
 }
 
-function getCellFromPointer(event) {
+function getCellFromPointer(event){
   const rect=canvas.getBoundingClientRect();
   const x=Math.floor((event.clientX-rect.left)/rect.width*GRID);
   const y=Math.floor((event.clientY-rect.top)/rect.height*GRID);
-
-  return {
-    x:Math.max(0,Math.min(GRID-1,x)),
-    y:Math.max(0,Math.min(GRID-1,y))
-  };
+  return{x:Math.max(0,Math.min(GRID-1,x)),y:Math.max(0,Math.min(GRID-1,y))};
 }
 
-function addRectangleToSelection(r) {
-  const left=Math.min(r.x1,r.x2);
-  const right=Math.max(r.x1,r.x2);
-  const top=Math.min(r.y1,r.y2);
-  const bottom=Math.max(r.y1,r.y2);
-
-  for (let y=top;y<=bottom;y++) {
-    for (let x=left;x<=right;x++) {
+function addRectangleToSelection(r){
+  const left=Math.min(r.x1,r.x2),right=Math.max(r.x1,r.x2);
+  const top=Math.min(r.y1,r.y2),bottom=Math.max(r.y1,r.y2);
+  for(let y=top;y<=bottom;y++){
+    for(let x=left;x<=right;x++){
       const index=y*GRID+x;
-      if (!occupied.has(index)) selected.add(index);
+      if(!occupied.has(index))selected.add(index);
     }
   }
 }
 
-canvas.addEventListener("pointerdown",function(event) {
-  if (event.pointerType==="mouse"&&event.button!==0) return;
+canvas.addEventListener("pointerdown",function(event){
+  if(event.pointerType==="mouse"&&event.button!==0)return;
+  const cell=getCellFromPointer(event),index=cell.y*GRID+cell.x;
 
-  const cell=getCellFromPointer(event);
-  const index=cell.y*GRID+cell.x;
-
-  if (occupied.has(index)) {
+  if(occupied.has(index)){
     const ad=findApprovedAdAt(index);
-    if (ad) {
+    if(ad){
       event.preventDefault();
       showLogoTooltip(ad,event,index);
       return;
@@ -664,160 +550,88 @@ canvas.addEventListener("pointerdown",function(event) {
   drawGrid();
 });
 
-canvas.addEventListener("pointermove",function(event) {
-  if (dragging&&dragStart) {
+canvas.addEventListener("pointermove",function(event){
+  if(dragging&&dragStart){
     hideLogoTooltip();
     const cell=getCellFromPointer(event);
     preview={x1:dragStart.x,y1:dragStart.y,x2:cell.x,y2:cell.y};
     drawGrid();
     return;
   }
-
-  if (event.pointerType==="touch") return;
-
-  const cell=getCellFromPointer(event);
-  const index=cell.y*GRID+cell.x;
-
-  if (!occupied.has(index)) {
-    hideLogoTooltip();
-    return;
-  }
-
+  if(event.pointerType==="touch")return;
+  const cell=getCellFromPointer(event),index=cell.y*GRID+cell.x;
+  if(!occupied.has(index)){hideLogoTooltip();return}
   showLogoTooltip(findApprovedAdAt(index),event,index);
 });
 
-canvas.addEventListener("pointerleave",function() {
-  if (!dragging) hideLogoTooltip();
-});
+canvas.addEventListener("pointerleave",function(){if(!dragging)hideLogoTooltip()});
 
-function finishSelection(event) {
-  if (!dragging||!dragStart) return;
+function finishSelection(event){
+  if(!dragging||!dragStart)return;
   const cell=getCellFromPointer(event);
-
-  addRectangleToSelection({
-    x1:dragStart.x,y1:dragStart.y,x2:cell.x,y2:cell.y
-  });
-
-  dragging=false;
-  dragStart=null;
-  preview=null;
-  drawGrid();
-  updateSummary();
+  addRectangleToSelection({x1:dragStart.x,y1:dragStart.y,x2:cell.x,y2:cell.y});
+  dragging=false;dragStart=null;preview=null;
+  drawGrid();updateSummary();
 }
-
 canvas.addEventListener("pointerup",finishSelection);
-canvas.addEventListener("pointercancel",function() {
-  dragging=false;
-  dragStart=null;
-  preview=null;
-  hideLogoTooltip();
-  drawGrid();
+canvas.addEventListener("pointercancel",function(){
+  dragging=false;dragStart=null;preview=null;hideLogoTooltip();drawGrid();
 });
 
-document.getElementById("zoomIn").addEventListener("click",function() {
-  if (cellSize<60) {
-    cellSize+=10;
-    updateCanvasSize();
-  }
+document.getElementById("zoomIn").addEventListener("click",function(){
+  if(cellSize<60){cellSize+=10;updateCanvasSize()}
 });
-
-document.getElementById("zoomOut").addEventListener("click",function() {
-  if (cellSize>10) {
-    cellSize-=10;
-    updateCanvasSize();
-  }
+document.getElementById("zoomOut").addEventListener("click",function(){
+  if(cellSize>10){cellSize-=10;updateCanvasSize()}
 });
-
-document.getElementById("clearSelection").addEventListener("click",function() {
-  selected.clear();
-  preview=null;
-  dragging=false;
-  dragStart=null;
-  hideLogoTooltip();
-  drawGrid();
-  updateSummary();
+document.getElementById("clearSelection").addEventListener("click",function(){
+  selected.clear();preview=null;dragging=false;dragStart=null;hideLogoTooltip();
+  drawGrid();updateSummary();
   document.getElementById("requestOutput").style.display="none";
 });
 
-document.getElementById("logo").addEventListener("change",function() {
-  const file=this.files[0];
-  const image=document.getElementById("logoPreview");
-
-  if (!file) {
-    image.removeAttribute("src");
-    image.style.display="none";
-    return;
-  }
-
-  if (!ALLOWED_LOGO_TYPES.has(file.type)||file.size>MAX_LOGO_BYTES) {
+document.getElementById("logo").addEventListener("change",function(){
+  const file=this.files[0],image=document.getElementById("logoPreview");
+  if(!file){image.removeAttribute("src");image.style.display="none";return}
+  if(!ALLOWED_LOGO_TYPES.has(file.type)||file.size>MAX_LOGO_BYTES){
     alert("Formato non valido o file superiore a 5 MB.");
-    this.value="";
-    image.removeAttribute("src");
-    image.style.display="none";
-    return;
+    this.value="";image.removeAttribute("src");image.style.display="none";return;
   }
-
   const reader=new FileReader();
-  reader.onload=e=>{
-    image.src=e.target.result;
-    image.style.display="block";
-  };
+  reader.onload=e=>{image.src=e.target.result;image.style.display="block"};
   reader.readAsDataURL(file);
 });
 
-async function uploadLogo(file) {
-  if (!file) return null;
+async function uploadLogo(file){
+  if(!file)return null;
+  if(!ALLOWED_LOGO_TYPES.has(file.type))throw new Error("Formato immagine non supportato.");
+  if(file.size>MAX_LOGO_BYTES)throw new Error("Il logo supera il limite di 5 MB.");
 
-  if (!ALLOWED_LOGO_TYPES.has(file.type)) {
-    throw new Error("Formato immagine non supportato.");
-  }
-
-  if (file.size>MAX_LOGO_BYTES) {
-    throw new Error("Il logo supera il limite di 5 MB.");
-  }
-
-  const extensions={
-    "image/jpeg":"jpg",
-    "image/png":"png",
-    "image/webp":"webp",
-    "image/gif":"gif"
-  };
-
-  const id=crypto.randomUUID
-    ?crypto.randomUUID()
-    :`${Date.now()}-${Math.random().toString(16).slice(2)}`;
-
+  const extensions={"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/gif":"gif"};
+  const id=crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const path=`pending/${id}.${extensions[file.type]}`;
 
-  const response=await fetch(
-    `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${path}`,
-    {
-      method:"POST",
-      headers:{
-        apikey:SUPABASE_KEY,
-        Authorization:`Bearer ${SUPABASE_KEY}`,
-        "Content-Type":file.type,
-        "Cache-Control":"3600",
-        "x-upsert":"false"
-      },
-      body:file
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Caricamento logo fallito: "+await response.text());
-  }
-
-  return {
+  const response=await fetch(`${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${path}`,{
+    method:"POST",
+    headers:{
+      apikey:SUPABASE_KEY,
+      Authorization:`Bearer ${SUPABASE_KEY}`,
+      "Content-Type":file.type,
+      "Cache-Control":"3600",
+      "x-upsert":"false"
+    },
+    body:file
+  });
+  if(!response.ok)throw new Error("Caricamento logo fallito: "+await response.text());
+  return{
     image_path:path,
     image_url:`${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`
   };
 }
 
-document.getElementById("purchaseForm").addEventListener("submit",async function(event) {
+document.getElementById("purchaseForm").addEventListener("submit",async function(event){
   event.preventDefault();
-
-  if (!selected.size) {
+  if(!selected.size){
     alert("Seleziona almeno un pixel prima di continuare.");
     document.getElementById("griglia").scrollIntoView({behavior:"smooth"});
     return;
@@ -831,18 +645,12 @@ document.getElementById("purchaseForm").addEventListener("submit",async function
   const logoFile=document.getElementById("logo").files[0]||null;
   const output=document.getElementById("requestOutput");
   const button=this.querySelector('button[type="submit"]');
-
   output.style.display="block";
   button.disabled=true;
 
-  try {
+  try{
     let logoInfo=null;
-
-    if (logoFile) {
-      output.textContent="Caricamento del logo...";
-      logoInfo=await uploadLogo(logoFile);
-    }
-
+    if(logoFile){output.textContent="Caricamento del logo...";logoInfo=await uploadLogo(logoFile)}
     output.textContent="Preparazione del pagamento Stripe...";
 
     const response=await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`,{
@@ -864,27 +672,17 @@ document.getElementById("purchaseForm").addEventListener("submit",async function
     });
 
     let result;
-    try { result=await response.json(); }
-    catch { throw new Error("Risposta non valida dal server."); }
-
-    if (!response.ok) {
-      throw new Error(result.error||"Errore durante la preparazione del pagamento.");
-    }
-
-    if (!result.checkout_url) {
-      throw new Error("Stripe non ha restituito il link di pagamento.");
-    }
+    try{result=await response.json()}catch{throw new Error("Risposta non valida dal server.")}
+    if(!response.ok)throw new Error(result.error||"Errore durante la preparazione del pagamento.");
+    if(!result.checkout_url)throw new Error("Stripe non ha restituito il link di pagamento.");
 
     const checkoutUrl=new URL(result.checkout_url);
-
-    if (checkoutUrl.protocol!=="https:"||checkoutUrl.hostname!=="checkout.stripe.com") {
+    if(checkoutUrl.protocol!=="https:"||checkoutUrl.hostname!=="checkout.stripe.com"){
       throw new Error("Indirizzo di pagamento Stripe non valido.");
     }
-
     output.textContent="Apertura della pagina di pagamento...";
     window.location.assign(checkoutUrl.href);
-
-  } catch (error) {
+  }catch(error){
     console.error("Errore checkout:",error);
     output.textContent="Pagamento non avviato: "+(error.message||"errore di connessione");
     button.disabled=false;
