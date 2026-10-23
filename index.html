@@ -6,620 +6,237 @@
 <meta name="theme-color" content="#090b0a">
 <meta name="description" content="Million Pixel Italia: scegli i tuoi pixel a 1 euro ciascuno.">
 <title>Million Pixel Italia — Un pixel alla volta</title>
-
 <style>
-:root {
-  --bg:#090b0a;
-  --surface:#111511;
-  --green:#a5ff38;
-  --white:#f5f7f2;
-  --muted:#a2aaa0;
-  --line:#293129;
-}
-* { box-sizing:border-box; }
-html { scroll-behavior:smooth; scroll-padding-top:85px; }
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--white);
-  font-family:Arial,Helvetica,sans-serif;
-  line-height:1.5;
-}
-a { color:inherit; text-decoration:none; }
-button,input,textarea { font:inherit; }
-button { cursor:pointer; }
-.container { width:min(1160px,calc(100% - 36px)); margin:0 auto; }
-
-.topbar {
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(9,11,10,.95);
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(14px);
-}
-.nav {
-  min-height:72px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:16px;
-}
-.brand {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:900;
-  font-size:17px;
-}
-.brand-mark {
-  width:36px;
-  height:36px;
-  display:grid;
-  place-items:center;
-  border-radius:9px;
-  color:#10150b;
-  background:var(--green);
-}
-.brand-name span { color:var(--green); }
-.nav-links {
-  display:flex;
-  align-items:center;
-  gap:22px;
-  color:#c4ccc2;
-  font-size:13px;
-}
-.nav-links a:hover { color:var(--green); }
-
-.btn {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:44px;
-  padding:11px 17px;
-  border:1px solid transparent;
-  border-radius:8px;
-  font-size:13px;
-  font-weight:800;
-  transition:transform .2s,background .2s;
-}
-.btn:hover { transform:translateY(-2px); }
-.btn-primary { color:#10150b; background:var(--green); }
-.btn-primary:hover { background:#bdff79; }
-.btn-secondary { color:white; background:#171d18; border-color:#394439; }
-.btn:disabled { opacity:.55; cursor:wait; transform:none; }
-
-.hero {
-  padding:78px 0 55px;
-  border-bottom:1px solid var(--line);
-  background:radial-gradient(ellipse at 80% 25%,rgba(110,190,38,.13),transparent 40%),var(--bg);
-}
-.hero-grid {
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  align-items:center;
-  gap:42px;
-}
-.eyebrow {
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:7px 11px;
-  border:1px solid #34452a;
-  border-radius:50px;
-  color:var(--green);
-  background:#11190e;
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:1.2px;
-  text-transform:uppercase;
-}
-.dot { width:7px; height:7px; border-radius:50%; background:var(--green); }
-h1 {
-  margin:23px 0 18px;
-  font-size:clamp(40px,6vw,74px);
-  line-height:1;
-  letter-spacing:-3px;
-}
-h1 span { color:var(--green); }
-.hero-copy { max-width:550px; color:#b0b8ae; font-size:16px; line-height:1.8; }
-.hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
-.hero-note { margin-top:20px; color:#879184; font-size:12px; }
-.hero-art {
-  min-height:310px;
-  display:grid;
-  place-items:center;
-  position:relative;
-  overflow:hidden;
-  border:1px solid #2a3827;
-  border-radius:18px;
-  background:radial-gradient(circle at center,rgba(165,255,56,.12),transparent 55%),#0d110d;
-}
-.hero-art::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  opacity:.4;
-  background-image:linear-gradient(#253020 1px,transparent 1px),linear-gradient(90deg,#253020 1px,transparent 1px);
-  background-size:22px 22px;
-}
-.pixel-art {
-  position:relative;
-  display:grid;
-  grid-template-columns:repeat(10,18px);
-  grid-template-rows:repeat(10,18px);
-  gap:3px;
-  transform:rotate(-5deg);
-}
-.pixel-art span { border:1px solid #293328; background:#151b14; }
-.pixel-art span.lit {
-  background:var(--green);
-  border-color:var(--green);
-  box-shadow:0 0 12px #a5ff3844;
-}
-.art-label {
-  position:absolute;
-  bottom:17px;
-  left:17px;
-  color:#b7c1b3;
-  font-size:11px;
-  letter-spacing:1.4px;
-}
-
-.stats-wrap { padding:0 0 45px; }
-.stats {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  overflow:hidden;
-  border:1px solid var(--line);
-  border-radius:13px;
-  background:var(--surface);
-}
-.stat { padding:22px; border-right:1px solid var(--line); }
-.stat:last-child { border-right:0; }
-.stat-value {
-  display:block;
-  margin-bottom:5px;
-  color:var(--green);
-  font-size:clamp(22px,3vw,33px);
-  font-weight:900;
-}
-.stat-label { color:var(--muted); font-size:12px; }
-
-.section { padding:48px 0; }
-.section-heading {
-  display:flex;
-  justify-content:space-between;
-  align-items:end;
-  gap:24px;
-  margin-bottom:24px;
-}
-.section-kicker {
-  margin-bottom:8px;
-  color:var(--green);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:2px;
-  text-transform:uppercase;
-}
-h2 { margin:0; font-size:clamp(27px,4vw,39px); line-height:1.15; letter-spacing:-1px; }
-.section-description { max-width:470px; color:var(--muted); font-size:13px; }
-
-.progress-card {
-  padding:20px;
-  margin-bottom:20px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--surface);
-}
-.progress-top {
-  display:flex;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-bottom:12px;
-  font-size:13px;
-}
-.progress-top strong { color:var(--green); }
-.progress-track { height:9px; overflow:hidden; border-radius:50px; background:#293129; }
-.progress-fill {
-  width:0;
-  height:100%;
-  border-radius:50px;
-  background:linear-gradient(90deg,#70df00,#c2ff7d);
-  transition:width .3s;
-}
-.progress-note { margin:11px 0 0; color:#899486; font-size:11px; }
-
-.grid-panel { overflow:hidden; border:1px solid var(--line); border-radius:13px; background:var(--surface); }
-.grid-toolbar {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  padding:14px;
-  border-bottom:1px solid var(--line);
-}
-.toolbar-group { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-.tool-btn {
-  min-height:37px;
-  padding:8px 12px;
-  border:1px solid #354034;
-  border-radius:7px;
-  color:white;
-  background:#192019;
-  font-size:12px;
-  font-weight:700;
-}
-.tool-btn:hover { border-color:var(--green); }
-.zoom-value { color:#c1cabc; font-size:12px; }
-.canvas-viewport {
-  width:100%;
-  height:460px;
-  overflow:auto;
-  overscroll-behavior:contain;
-  background:#0c100c;
-  scrollbar-color:#53614d #151a15;
-}
-.canvas-stage { position:relative; width:20000px; height:20000px; }
-#pixelCanvas,#gridOverlay {
-  position:absolute;
-  top:0;
-  left:0;
-  width:20000px;
-  height:20000px;
-}
-#pixelCanvas { display:block; max-width:none; cursor:crosshair; touch-action:none; }
-#gridOverlay {
-  pointer-events:none;
-  background-image:
-    repeating-linear-gradient(to right,transparent 0,transparent calc(var(--cell-size) - 1px),#050505 calc(var(--cell-size) - 1px),#050505 var(--cell-size)),
-    repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--cell-size) - 1px),#050505 calc(var(--cell-size) - 1px),#050505 var(--cell-size));
-}
-.grid-footer {
-  display:flex;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:10px;
-  padding:13px 15px;
-  border-top:1px solid var(--line);
-  color:var(--muted);
-  font-size:12px;
-}
-.legend { display:flex; align-items:center; gap:8px; }
-.legend-box { width:13px; height:13px; border:1px solid #000; background:var(--green); }
-.price-tag { color:var(--green); font-weight:800; }
-
-.purchase-layout { display:grid; grid-template-columns:1fr .85fr; gap:20px; align-items:start; }
-.card { padding:23px; border:1px solid var(--line); border-radius:13px; background:var(--surface); }
-.card h3 { margin:0 0 7px; font-size:21px; }
-.card-intro { margin:0 0 22px; color:var(--muted); font-size:13px; }
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-.field { display:flex; flex-direction:column; gap:7px; }
-.field.full { grid-column:1/-1; }
-.field label { color:#dce3d7; font-size:12px; font-weight:700; }
-.field input,.field textarea {
-  width:100%;
-  min-width:0;
-  padding:12px;
-  border:1px solid #354034;
-  border-radius:8px;
-  outline:none;
-  color:white;
-  background:#0b0f0b;
-  font-size:13px;
-}
-.field input:focus,.field textarea:focus { border-color:var(--green); }
-.field textarea { min-height:90px; resize:vertical; }
-#logoPreview {
-  display:none;
-  max-width:180px;
-  max-height:140px;
-  object-fit:contain;
-  padding:6px;
-  margin-top:8px;
-  border-radius:8px;
-  background:white;
-}
-.file-note { margin:2px 0 0; color:#899486; font-size:11px; line-height:1.6; }
-.summary {
-  padding:18px;
-  margin:20px 0;
-  border:1px solid #33422c;
-  border-radius:10px;
-  background:#121a10;
-}
-.summary-row {
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  margin:9px 0;
-  color:#c0c9ba;
-  font-size:13px;
-}
-.summary-row strong { color:white; text-align:right; }
-.summary-total { padding-top:14px; margin-top:14px; border-top:1px solid #354332; }
-.summary-total span,.summary-total strong { color:var(--green); font-size:23px; font-weight:900; }
-.full-btn { width:100%; }
-.fine-print { margin-top:13px; color:#8c9787; font-size:11px; line-height:1.7; }
-#requestOutput {
-  display:none;
-  margin-top:15px;
-  padding:14px;
-  overflow-wrap:anywhere;
-  white-space:pre-wrap;
-  border:1px solid #354034;
-  border-radius:8px;
-  background:#0b0f0b;
-  color:#dce3d7;
-  font-size:12px;
-  line-height:1.7;
-}
-.how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-top:25px; }
-.how-card {
-  padding:22px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:linear-gradient(145deg,#141914,#0d100d);
-}
-.how-number {
-  width:37px;
-  height:37px;
-  display:grid;
-  place-items:center;
-  margin-bottom:16px;
-  border:1px solid #3e542f;
-  border-radius:9px;
-  color:var(--green);
-  background:#192317;
-  font-weight:900;
-}
-.how-card h3 { margin:0 0 8px; font-size:16px; }
-.how-card p { margin:0; color:var(--muted); font-size:13px; line-height:1.7; }
-.final-cta {
-  padding:38px;
-  border:1px solid #3a4d30;
-  border-radius:16px;
-  background:radial-gradient(ellipse at 90% 20%,#a5ff381f,transparent 45%),#111711;
-}
-.final-cta h2 { max-width:620px; margin-bottom:13px; }
-.final-cta p { max-width:580px; margin:0 0 20px; color:#aeb9a7; font-size:14px; }
-footer { margin-top:45px; border-top:1px solid var(--line); }
-.footer-inner {
-  display:flex;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:14px;
-  padding:24px 0;
-  color:#818b7c;
-  font-size:11px;
-}
-
-@media(max-width:850px) {
-  .hero-grid { grid-template-columns:1fr; }
-  .hero-art { min-height:260px; }
-  .purchase-layout { grid-template-columns:1fr; }
-  .section-heading { align-items:start; flex-direction:column; gap:8px; }
-}
-@media(max-width:600px) {
-  .container { width:calc(100% - 24px); }
-  .brand { font-size:13px; gap:7px; }
-  .brand-mark { width:31px; height:31px; }
-  .nav-links { gap:0; }
-  .nav-links a:not(.btn) { display:none; }
-  .nav-links .btn { min-height:37px; padding:8px 10px; font-size:11px; }
-  .hero { padding:50px 0 40px; }
-  h1 { letter-spacing:-2px; }
-  .hero-copy { font-size:15px; }
-  .hero-art { min-height:230px; }
-  .stats-wrap { padding-bottom:28px; }
-  .stat { padding:14px 8px; }
-  .stat-label { font-size:10px; }
-  .section { padding:32px 0; }
-  .canvas-viewport { height:360px; }
-  .form-grid,.how-grid { grid-template-columns:1fr; }
-  .field.full { grid-column:auto; }
-  .card { padding:16px; }
-  .final-cta { padding:24px; }
-}
+:root{--bg:#090b0a;--surface:#111511;--green:#a5ff38;--white:#f5f7f2;--muted:#a2aaa0;--line:#293129}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:85px}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Arial,Helvetica,sans-serif;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.container{width:min(1160px,calc(100% - 36px));margin:0 auto}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(9,11,10,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+.nav{min-height:72px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px}
+.brand-mark{width:36px;height:36px;display:grid;place-items:center;border-radius:9px;color:#10150b;background:var(--green)}
+.brand-name span{color:var(--green)}
+.nav-links{display:flex;align-items:center;gap:22px;color:#c4ccc2;font-size:13px}
+.nav-links a:hover{color:var(--green)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 17px;border:1px solid transparent;border-radius:8px;font-size:13px;font-weight:800;transition:transform .2s,background .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{color:#10150b;background:var(--green)}
+.btn-primary:hover{background:#bdff79}
+.btn-secondary{color:white;background:#171d18;border-color:#394439}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.hero{padding:78px 0 55px;border-bottom:1px solid var(--line);background:radial-gradient(ellipse at 80% 25%,rgba(110,190,38,.13),transparent 40%),var(--bg)}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:42px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #34452a;border-radius:50px;color:var(--green);background:#11190e;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+h1{margin:23px 0 18px;font-size:clamp(40px,6vw,74px);line-height:1;letter-spacing:-3px}
+h1 span{color:var(--green)}
+.hero-copy{max-width:550px;color:#b0b8ae;font-size:16px;line-height:1.8}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.hero-note{margin-top:20px;color:#879184;font-size:12px}
+.hero-art{min-height:310px;display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid #2a3827;border-radius:18px;background:radial-gradient(circle at center,rgba(165,255,56,.12),transparent 55%),#0d110d}
+.hero-art::before{content:"";position:absolute;inset:0;opacity:.4;background-image:linear-gradient(#253020 1px,transparent 1px),linear-gradient(90deg,#253020 1px,transparent 1px);background-size:22px 22px}
+.pixel-art{position:relative;display:grid;grid-template-columns:repeat(10,18px);grid-template-rows:repeat(10,18px);gap:3px;transform:rotate(-5deg)}
+.pixel-art span{border:1px solid #293328;background:#151b14}
+.pixel-art span.lit{background:var(--green);border-color:var(--green);box-shadow:0 0 12px #a5ff3844}
+.art-label{position:absolute;bottom:17px;left:17px;color:#b7c1b3;font-size:11px;letter-spacing:1.4px}
+.stats-wrap{padding:0 0 45px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.stat{padding:22px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat-value{display:block;margin-bottom:5px;color:var(--green);font-size:clamp(22px,3vw,33px);font-weight:900}
+.stat-label{color:var(--muted);font-size:12px}
+.section{padding:48px 0}
+.section-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:24px}
+.section-kicker{margin-bottom:8px;color:var(--green);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+h2{margin:0;font-size:clamp(27px,4vw,39px);line-height:1.15;letter-spacing:-1px}
+.section-description{max-width:470px;color:var(--muted);font-size:13px}
+.progress-card{padding:20px;margin-bottom:20px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.progress-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;font-size:13px}
+.progress-top strong{color:var(--green)}
+.progress-track{height:9px;overflow:hidden;border-radius:50px;background:#293129}
+.progress-fill{width:0;height:100%;border-radius:50px;background:linear-gradient(90deg,#70df00,#c2ff7d);transition:width .3s}
+.progress-note{margin:11px 0 0;color:#899486;font-size:11px}
+.grid-panel{overflow:hidden;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.grid-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--line)}
+.toolbar-group{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.tool-btn{min-height:37px;padding:8px 12px;border:1px solid #354034;border-radius:7px;color:white;background:#192019;font-size:12px;font-weight:700}
+.tool-btn:hover{border-color:var(--green)}
+.zoom-value{color:#c1cabc;font-size:12px}
+.canvas-viewport{position:relative;width:100%;height:460px;overflow:auto;overscroll-behavior:contain;background:#0c100c;scrollbar-color:#53614d #151a15}
+.canvas-stage{position:relative;width:20000px;height:20000px}
+#pixelCanvas,#gridOverlay{position:absolute;top:0;left:0;width:20000px;height:20000px}
+#pixelCanvas{display:block;max-width:none;cursor:crosshair;touch-action:none}
+#gridOverlay{pointer-events:none;background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(var(--cell-size) - 1px),#050505 calc(var(--cell-size) - 1px),#050505 var(--cell-size)),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--cell-size) - 1px),#050505 calc(var(--cell-size) - 1px),#050505 var(--cell-size))}
+.logo-tooltip{display:none;position:absolute;z-index:50;width:240px;max-width:calc(100% - 16px);padding:12px;border:1px solid var(--green);border-radius:10px;background:#101610;box-shadow:0 10px 35px #000b;pointer-events:none}
+.logo-tooltip img{display:block;width:100%;height:130px;object-fit:contain;border-radius:6px;background:#fff;margin-bottom:9px}
+.tooltip-company{font-size:14px;font-weight:800;color:var(--green);overflow-wrap:anywhere}
+.tooltip-position{margin-top:4px;color:var(--muted);font-size:11px}
+.grid-footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:13px 15px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+.legend{display:flex;align-items:center;gap:8px}
+.legend-box{width:13px;height:13px;border:1px solid #000;background:var(--green)}
+.price-tag{color:var(--green);font-weight:800}
+.purchase-layout{display:grid;grid-template-columns:1fr .85fr;gap:20px;align-items:start}
+.card{padding:23px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.card h3{margin:0 0 7px;font-size:21px}
+.card-intro{margin:0 0 22px;color:var(--muted);font-size:13px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+.field label{color:#dce3d7;font-size:12px;font-weight:700}
+.field input,.field textarea{width:100%;min-width:0;padding:12px;border:1px solid #354034;border-radius:8px;outline:none;color:white;background:#0b0f0b;font-size:13px}
+.field input:focus,.field textarea:focus{border-color:var(--green)}
+.field textarea{min-height:90px;resize:vertical}
+#logoPreview{display:none;max-width:180px;max-height:140px;object-fit:contain;padding:6px;margin-top:8px;border-radius:8px;background:white}
+.file-note{margin:2px 0 0;color:#899486;font-size:11px;line-height:1.6}
+.summary{padding:18px;margin:20px 0;border:1px solid #33422c;border-radius:10px;background:#121a10}
+.summary-row{display:flex;justify-content:space-between;gap:12px;margin:9px 0;color:#c0c9ba;font-size:13px}
+.summary-row strong{color:white;text-align:right}
+.summary-total{padding-top:14px;margin-top:14px;border-top:1px solid #354332}
+.summary-total span,.summary-total strong{color:var(--green);font-size:23px;font-weight:900}
+.full-btn{width:100%}
+.fine-print{margin-top:13px;color:#8c9787;font-size:11px;line-height:1.7}
+#requestOutput{display:none;margin-top:15px;padding:14px;overflow-wrap:anywhere;white-space:pre-wrap;border:1px solid #354034;border-radius:8px;background:#0b0f0b;color:#dce3d7;font-size:12px;line-height:1.7}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:25px}
+.how-card{padding:22px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#141914,#0d100d)}
+.how-number{width:37px;height:37px;display:grid;place-items:center;margin-bottom:16px;border:1px solid #3e542f;border-radius:9px;color:var(--green);background:#192317;font-weight:900}
+.how-card h3{margin:0 0 8px;font-size:16px}
+.how-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
+.final-cta{padding:38px;border:1px solid #3a4d30;border-radius:16px;background:radial-gradient(ellipse at 90% 20%,#a5ff381f,transparent 45%),#111711}
+.final-cta h2{max-width:620px;margin-bottom:13px}
+.final-cta p{max-width:580px;margin:0 0 20px;color:#aeb9a7;font-size:14px}
+footer{margin-top:45px;border-top:1px solid var(--line)}
+.footer-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:24px 0;color:#818b7c;font-size:11px}
+@media(max-width:850px){.hero-grid{grid-template-columns:1fr}.hero-art{min-height:260px}.purchase-layout{grid-template-columns:1fr}.section-heading{align-items:start;flex-direction:column;gap:8px}}
+@media(max-width:600px){.container{width:calc(100% - 24px)}.brand{font-size:13px;gap:7px}.brand-mark{width:31px;height:31px}.nav-links{gap:0}.nav-links a:not(.btn){display:none}.nav-links .btn{min-height:37px;padding:8px 10px;font-size:11px}.hero{padding:50px 0 40px}h1{letter-spacing:-2px}.hero-copy{font-size:15px}.hero-art{min-height:230px}.stats-wrap{padding-bottom:28px}.stat{padding:14px 8px}.stat-label{font-size:10px}.section{padding:32px 0}.canvas-viewport{height:360px}.form-grid,.how-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.card{padding:16px}.final-cta{padding:24px}}
 </style>
 </head>
-
 <body>
 <header class="topbar">
-  <div class="container nav">
-    <a class="brand" href="#inizio">
-      <span class="brand-mark">M</span>
-      <span class="brand-name">Million Pixel <span>Italia</span></span>
-    </a>
-    <nav class="nav-links">
-      <a href="#progetto">Il progetto</a>
-      <a href="#griglia">La griglia</a>
-      <a href="#come-funziona">Come funziona</a>
-      <a href="#griglia" class="btn btn-primary">Acquista pixel ↗</a>
-    </nav>
-  </div>
+<div class="container nav">
+<a class="brand" href="#inizio"><span class="brand-mark">M</span><span class="brand-name">Million Pixel <span>Italia</span></span></a>
+<nav class="nav-links"><a href="#progetto">Il progetto</a><a href="#griglia">La griglia</a><a href="#come-funziona">Come funziona</a><a href="#griglia" class="btn btn-primary">Acquista pixel ↗</a></nav>
+</div>
 </header>
-
 <main id="inizio">
 <section class="hero" id="progetto">
-  <div class="container hero-grid">
-    <div>
-      <div class="eyebrow"><span class="dot"></span> Un progetto digitale italiano</div>
-      <h1>Un milione di pixel.<br><span>Il tuo spazio.</span></h1>
-      <p class="hero-copy">Un'idea semplice, uno spazio tutto da conquistare. Scegli i tuoi pixel, crea la tua presenza digitale e diventa parte di Million Pixel Italia.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#griglia">Scegli i tuoi pixel ↗</a>
-        <a class="btn btn-secondary" href="#come-funziona">Scopri come funziona</a>
-      </div>
-      <p class="hero-note">1 pixel = 1 € · Puoi iniziare anche con un solo pixel</p>
-    </div>
-    <div class="hero-art">
-      <div class="pixel-art" id="heroPixelArt"></div>
-      <div class="art-label">ONE MILLION · ONE IDEA</div>
-    </div>
-  </div>
+<div class="container hero-grid">
+<div>
+<div class="eyebrow"><span class="dot"></span> Un progetto digitale italiano</div>
+<h1>Un milione di pixel.<br><span>Il tuo spazio.</span></h1>
+<p class="hero-copy">Un'idea semplice, uno spazio tutto da conquistare. Scegli i tuoi pixel, crea la tua presenza digitale e diventa parte di Million Pixel Italia.</p>
+<div class="hero-actions"><a class="btn btn-primary" href="#griglia">Scegli i tuoi pixel ↗</a><a class="btn btn-secondary" href="#come-funziona">Scopri come funziona</a></div>
+<p class="hero-note">1 pixel = 1 € · Puoi iniziare anche con un solo pixel</p>
+</div>
+<div class="hero-art"><div class="pixel-art" id="heroPixelArt"></div><div class="art-label">ONE MILLION · ONE IDEA</div></div>
+</div>
 </section>
-
 <section class="container stats-wrap">
-  <div class="stats">
-    <div class="stat"><span class="stat-value">1.000.000</span><span class="stat-label">Pixel totali nel progetto</span></div>
-    <div class="stat"><span class="stat-value">1 €</span><span class="stat-label">Prezzo per ogni pixel</span></div>
-    <div class="stat"><span class="stat-value" id="headerSelected">0</span><span class="stat-label">Pixel nella tua selezione</span></div>
-  </div>
+<div class="stats">
+<div class="stat"><span class="stat-value">1.000.000</span><span class="stat-label">Pixel totali nel progetto</span></div>
+<div class="stat"><span class="stat-value">1 €</span><span class="stat-label">Prezzo per ogni pixel</span></div>
+<div class="stat"><span class="stat-value" id="headerSelected">0</span><span class="stat-label">Pixel nella tua selezione</span></div>
+</div>
 </section>
-
 <section class="section" id="griglia">
 <div class="container">
-  <div class="section-heading">
-    <div><div class="section-kicker">Il cuore del progetto</div><h2>Ogni quadratino è un'opportunità.</h2></div>
-    <p class="section-description">Esplora la griglia, scegli il tuo spazio e guarda il prezzo aggiornarsi in tempo reale. Anche un solo pixel conta.</p>
-  </div>
-
-  <div class="progress-card">
-    <div class="progress-top"><span>La conquista del milione</span><strong id="progressLabel">0% completato</strong></div>
-    <div class="progress-track" role="progressbar" aria-label="Avanzamento dei pixel venduti" aria-valuemin="0" aria-valuemax="1000000" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-    <p class="progress-note">I pixel occupati vengono recuperati dagli annunci approvati. La selezione non costituisce una vendita.</p>
-  </div>
-
-  <div class="grid-panel">
-    <div class="grid-toolbar">
-      <div class="toolbar-group">
-        <button type="button" class="tool-btn" id="zoomOut">− Riduci</button>
-        <button type="button" class="tool-btn" id="zoomIn">+ Ingrandisci</button>
-        <span class="zoom-value">Quadratino: <strong id="zoomValue">20 px</strong></span>
-      </div>
-      <button type="button" class="tool-btn" id="clearSelection">Azzera selezione</button>
-    </div>
-    <div class="canvas-viewport" id="canvasViewport">
-      <div class="canvas-stage" id="canvasStage">
-        <canvas id="pixelCanvas" width="1000" height="1000"></canvas>
-        <div id="gridOverlay" aria-hidden="true"></div>
-      </div>
-    </div>
-    <div class="grid-footer">
-      <div class="legend"><span class="legend-box"></span> Pixel selezionato</div>
-      <span>Trascina per selezionare un rettangolo</span>
-      <span class="price-tag">1 € / pixel</span>
-    </div>
-  </div>
+<div class="section-heading"><div><div class="section-kicker">Il cuore del progetto</div><h2>Ogni quadratino è un'opportunità.</h2></div><p class="section-description">Esplora la griglia, scegli il tuo spazio e guarda il prezzo aggiornarsi in tempo reale. Anche un solo pixel conta.</p></div>
+<div class="progress-card">
+<div class="progress-top"><span>La conquista del milione</span><strong id="progressLabel">0% completato</strong></div>
+<div class="progress-track" role="progressbar" aria-label="Avanzamento dei pixel venduti" aria-valuemin="0" aria-valuemax="1000000" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+<p class="progress-note">La selezione non è una vendita; l'avanzamento verrà aggiornato con gli acquisti confermati.</p>
+</div>
+<div class="grid-panel">
+<div class="grid-toolbar">
+<div class="toolbar-group"><button type="button" class="tool-btn" id="zoomOut">− Riduci</button><button type="button" class="tool-btn" id="zoomIn">+ Ingrandisci</button><span class="zoom-value">Quadratino: <strong id="zoomValue">20 px</strong></span></div>
+<button type="button" class="tool-btn" id="clearSelection">Azzera selezione</button>
+</div>
+<div class="canvas-viewport" id="canvasViewport">
+<div class="canvas-stage" id="canvasStage"><canvas id="pixelCanvas" width="1000" height="1000"></canvas><div id="gridOverlay" aria-hidden="true"></div></div>
+<div class="logo-tooltip" id="logoTooltip"><img id="tooltipLogo" alt="Logo dell'azienda"><div class="tooltip-company" id="tooltipCompany"></div><div class="tooltip-position" id="tooltipPosition"></div></div>
+</div>
+<div class="grid-footer"><div class="legend"><span class="legend-box"></span> Pixel selezionato</div><span>Trascina per selezionare un rettangolo</span><span class="price-tag">1 € / pixel</span></div>
+</div>
 </div>
 </section>
-
 <section class="section" id="acquisto">
 <div class="container">
-  <div class="section-heading">
-    <div><div class="section-kicker">Il tuo spazio digitale</div><h2>Prepariamo la tua richiesta.</h2></div>
-    <p class="section-description">Inserisci i tuoi dati e visualizza il riepilogo della selezione.</p>
-  </div>
-  <div class="purchase-layout">
-    <div class="card">
-      <h3>I tuoi dati</h3>
-      <p class="card-intro">Per persone, marchi e aziende.</p>
-      <form id="purchaseForm">
-        <div class="form-grid">
-          <div class="field"><label for="company">Nome o azienda *</label><input type="text" id="company" placeholder="Il tuo nome o marchio" maxlength="200" required></div>
-          <div class="field"><label for="email">Email *</label><input type="email" id="email" placeholder="nome@esempio.it" maxlength="320" required></div>
-          <div class="field full"><label for="website">Sito internet (facoltativo)</label><input type="url" id="website" placeholder="https://www.esempio.it" maxlength="2048"></div>
-          <div class="field full">
-            <label for="logo">Logo o immagine (facoltativo, massimo 5 MB)</label>
-            <input type="file" id="logo" accept="image/jpeg,image/png,image/webp,image/gif">
-            <img id="logoPreview" alt="Anteprima del logo scelto">
-            <p class="file-note">Formati ammessi: JPG, PNG, WEBP o GIF. Il logo viene caricato prima di aprire il pagamento.</p>
-          </div>
-          <div class="field full"><label for="notes">Messaggio (facoltativo)</label><textarea id="notes" maxlength="2000" placeholder="Scrivi un breve messaggio..."></textarea></div>
-        </div>
-        <button type="submit" class="btn btn-primary full-btn" style="margin-top:20px">Procedi al pagamento ↗</button>
-        <div id="requestOutput" aria-live="polite"></div>
-        <p class="fine-print">Il pagamento viene elaborato da Stripe. La pubblicazione dipende dalla conferma del pagamento da parte del server.</p>
-      </form>
-    </div>
-
-    <aside class="card">
-      <h3>Il tuo riepilogo</h3>
-      <p class="card-intro">Il totale si aggiorna mentre scegli i pixel.</p>
-      <div class="summary">
-        <div class="summary-row"><span>Pixel selezionati</span><strong id="summaryPixels">0</strong></div>
-        <div class="summary-row"><span>Prezzo per pixel</span><strong>1,00 €</strong></div>
-        <div class="summary-row"><span>Dimensione della griglia</span><strong>1.000 × 1.000</strong></div>
-        <div class="summary-row summary-total"><span>Totale</span><strong id="summaryPrice">0,00 €</strong></div>
-      </div>
-      <a href="#griglia" class="btn btn-secondary full-btn">Torna alla griglia ↑</a>
-      <p class="fine-print">La selezione non riserva i pixel fino alla conferma del pagamento.</p>
-    </aside>
-  </div>
+<div class="section-heading"><div><div class="section-kicker">Il tuo spazio digitale</div><h2>Prepariamo la tua richiesta.</h2></div><p class="section-description">Inserisci i tuoi dati e visualizza il riepilogo della selezione.</p></div>
+<div class="purchase-layout">
+<div class="card">
+<h3>I tuoi dati</h3><p class="card-intro">Per persone, marchi e aziende.</p>
+<form id="purchaseForm">
+<div class="form-grid">
+<div class="field"><label for="company">Nome o azienda *</label><input type="text" id="company" placeholder="Il tuo nome o marchio" maxlength="200" required></div>
+<div class="field"><label for="email">Email *</label><input type="email" id="email" placeholder="nome@esempio.it" maxlength="320" required></div>
+<div class="field full"><label for="website">Sito internet (facoltativo)</label><input type="url" id="website" placeholder="https://www.esempio.it" maxlength="2048"></div>
+<div class="field full"><label for="logo">Logo o immagine (facoltativo, massimo 5 MB)</label><input type="file" id="logo" accept="image/jpeg,image/png,image/webp,image/gif"><img id="logoPreview" alt="Anteprima del logo scelto"><p class="file-note">Formati ammessi: JPG, PNG, WEBP o GIF. Il logo sarà caricato prima di aprire il pagamento.</p></div>
+<div class="field full"><label for="notes">Messaggio (facoltativo)</label><textarea id="notes" maxlength="2000" placeholder="Scrivi un breve messaggio..."></textarea></div>
+</div>
+<div class="summary">
+<div class="summary-row"><span>Pixel selezionati</span><strong id="summaryPixels">0</strong></div>
+<div class="summary-row summary-total"><span>Totale</span><strong id="summaryPrice">0,00 €</strong></div>
+</div>
+<button type="submit" class="btn btn-primary full-btn">Procedi al pagamento ↗</button>
+<div id="requestOutput" aria-live="polite"></div>
+<p class="fine-print">Il pagamento viene elaborato da Stripe. I pixel saranno pubblicati soltanto dopo la conferma verificata del pagamento. Il logo viene caricato su Supabase Storage; la sua associazione all'ordine e la pubblicazione finale richiedono anche la configurazione del server.</p>
+</form>
+</div>
+<div class="card"><h3>Come funziona</h3><p class="card-intro">Il tuo spazio, un pixel alla volta.</p><p class="fine-print">1. Seleziona i pixel liberi nella griglia.<br>2. Inserisci il nome e l'email.<br>3. Carica il logo, se ne hai uno.<br>4. Procedi al pagamento sicuro tramite Stripe.<br><br>I pixel già occupati non possono essere selezionati di nuovo.</p></div>
+</div>
 </div>
 </section>
-
 <section class="section" id="come-funziona">
 <div class="container">
-  <div class="section-heading">
-    <div><div class="section-kicker">Semplice e diretto</div><h2>Come funziona.</h2></div>
-    <p class="section-description">Un progetto costruito intorno a un'idea semplice: scegliere uno spazio, un pixel alla volta.</p>
-  </div>
-  <div class="how-grid">
-    <article class="how-card"><div class="how-number">01</div><h3>Scegli il tuo spazio</h3><p>Seleziona un quadratino oppure trascina per scegliere un'area.</p></article>
-    <article class="how-card"><div class="how-number">02</div><h3>Prepara la tua immagine</h3><p>Inserisci il tuo nome, i riferimenti e il logo da associare al tuo spazio.</p></article>
-    <article class="how-card"><div class="how-number">03</div><h3>Diventa parte del progetto</h3><p>Completa il pagamento per registrare il tuo spazio.</p></article>
-  </div>
+<div class="section-heading"><div><div class="section-kicker">Tre passaggi</div><h2>Un'idea, uno spazio, una storia.</h2></div><p class="section-description">Un progetto costruito intorno a un'idea semplice: scegliere uno spazio, un pixel alla volta.</p></div>
+<div class="how-grid">
+<article class="how-card"><div class="how-number">01</div><h3>Scegli il tuo spazio</h3><p>Seleziona un quadratino oppure trascina per scegliere un'area.</p></article>
+<article class="how-card"><div class="how-number">02</div><h3>Prepara la tua immagine</h3><p>Inserisci il tuo nome, i riferimenti e il logo che vorresti associare.</p></article>
+<article class="how-card"><div class="how-number">03</div><h3>Diventa parte del progetto</h3><p>Completa il pagamento per registrare il tuo spazio.</p></article>
+</div>
 </div>
 </section>
-
-<section class="section">
-<div class="container">
-  <div class="final-cta">
-    <div class="section-kicker">Il tuo momento</div>
-    <h2>Non serve un milione di pixel per lasciare il segno.</h2>
-    <p>Puoi iniziare con uno solo. Il tuo spazio parte da 1 € per pixel.</p>
-    <a href="#griglia" class="btn btn-primary">Scegli il tuo primo pixel ↗</a>
-  </div>
-</div>
-</section>
+<section class="section"><div class="container"><div class="final-cta"><div class="section-kicker">Il tuo momento</div><h2>Non serve un milione di pixel per lasciare il segno.</h2><p>Puoi iniziare con uno solo. Il tuo spazio parte da 1 € per pixel.</p><a href="#griglia" class="btn btn-primary">Scegli il tuo primo pixel ↗</a></div></div></section>
 </main>
-
-<footer>
-  <div class="container footer-inner">
-    <span>© Million Pixel Italia</span>
-    <span>Un pixel alla volta.</span>
-    <a href="#inizio">Torna all'inizio ↑</a>
-  </div>
-</footer>
-
+<footer><div class="container footer-inner"><span>© Million Pixel Italia</span><span>Un pixel alla volta.</span><a href="#inizio">Torna all'inizio ↑</a></div></footer>
 <script>
 "use strict";
 
-const GRID = 1000;
-const TOTAL_PIXELS = GRID * GRID;
-const SUPABASE_URL = "https://rdrsqylyvgoafuzoljis.supabase.co";
-const SUPABASE_KEY = "sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
-const STORAGE_BUCKET = "pixel-images";
-const MAX_LOGO_BYTES = 5 * 1024 * 1024;
-const ALLOWED_LOGO_TYPES = new Set([
-  "image/jpeg", "image/png", "image/webp", "image/gif"
-]);
-const PRICE_PER_PIXEL = 1;
+const GRID=1000;
+const SUPABASE_URL="https://rdrsqylyvgoafuzoljis.supabase.co";
+const SUPABASE_KEY="sb_publishable_IVOXAaWiLB62EiiD85DkSQ_IaQaXEaB";
+const STORAGE_BUCKET="pixel-images";
+const MAX_LOGO_BYTES=5*1024*1024;
+const ALLOWED_LOGO_TYPES=new Set(["image/jpeg","image/png","image/webp","image/gif"]);
+const PRICE_PER_PIXEL=1;
 
-const canvas = document.getElementById("pixelCanvas");
-const ctx = canvas.getContext("2d");
-const stage = document.getElementById("canvasStage");
-const gridOverlay = document.getElementById("gridOverlay");
-const viewport = document.getElementById("canvasViewport");
+const canvas=document.getElementById("pixelCanvas");
+const ctx=canvas.getContext("2d");
+const stage=document.getElementById("canvasStage");
+const gridOverlay=document.getElementById("gridOverlay");
+const viewport=document.getElementById("canvasViewport");
+const logoTooltip=document.getElementById("logoTooltip");
+const tooltipLogo=document.getElementById("tooltipLogo");
+const tooltipCompany=document.getElementById("tooltipCompany");
+const tooltipPosition=document.getElementById("tooltipPosition");
+const selected=new Set();
+const occupied=new Set();
 
-const selected = new Set();
-const occupied = new Set();
-let approvedAds = [];
-let cellSize = 20;
-let dragging = false;
-let dragStart = null;
-let preview = null;
+let approvedAds=[];
+let cellSize=20;
+let dragging=false;
+let dragStart=null;
+let preview=null;
 
-function formatNumber(number) {
+function formatNumber(number){
   return number.toLocaleString("it-IT");
 }
 
-function formatEuro(number) {
-  return number.toLocaleString("it-IT", {
+function formatEuro(number){
+  return number.toLocaleString("it-IT",{
     style:"currency",
     currency:"EUR",
     minimumFractionDigits:2,
@@ -627,21 +244,21 @@ function formatEuro(number) {
   });
 }
 
-function createHeroPixelArt() {
-  const art = document.getElementById("heroPixelArt");
+function createHeroPixelArt(){
+  const art=document.getElementById("heroPixelArt");
 
-  for (let y = 0; y < 10; y++) {
-    for (let x = 0; x < 10; x++) {
-      const pixel = document.createElement("span");
-      const distance = Math.abs(x - 4.5) + Math.abs(y - 4.5);
+  for(let y=0;y<10;y++){
+    for(let x=0;x<10;x++){
+      const pixel=document.createElement("span");
+      const distance=Math.abs(x-4.5)+Math.abs(y-4.5);
 
-      if (
-        distance < 3 ||
-        (x === 2 && y > 2 && y < 7) ||
-        (x === 7 && y > 2 && y < 7) ||
-        (y === 2 && x > 2 && x < 7) ||
-        (y === 7 && x > 2 && x < 7)
-      ) {
+      if(
+        distance<3||
+        (x===2&&y>2&&y<7)||
+        (x===7&&y>2&&y<7)||
+        (y===2&&x>2&&x<7)||
+        (y===7&&x>2&&x<7)
+      ){
         pixel.classList.add("lit");
       }
 
@@ -650,141 +267,100 @@ function createHeroPixelArt() {
   }
 }
 
-function updateCanvasSize() {
-  const size = GRID * cellSize;
+function updateCanvasSize(){
+  const size=GRID*cellSize;
 
-  stage.style.width = size + "px";
-  stage.style.height = size + "px";
-  canvas.style.width = size + "px";
-  canvas.style.height = size + "px";
-  gridOverlay.style.width = size + "px";
-  gridOverlay.style.height = size + "px";
-  gridOverlay.style.setProperty("--cell-size", cellSize + "px");
+  stage.style.width=size+"px";
+  stage.style.height=size+"px";
+  canvas.style.width=size+"px";
+  canvas.style.height=size+"px";
+  gridOverlay.style.width=size+"px";
+  gridOverlay.style.height=size+"px";
+  gridOverlay.style.backgroundImage=
+    `repeating-linear-gradient(to right,transparent 0,transparent calc(${cellSize}px - 1px),#050505 calc(${cellSize}px - 1px),#050505 ${cellSize}px),repeating-linear-gradient(to bottom,transparent 0,transparent calc(${cellSize}px - 1px),#050505 calc(${cellSize}px - 1px),#050505 ${cellSize}px)`;
 
-  document.getElementById("zoomValue").textContent = cellSize + " px";
+  document.getElementById("zoomValue").textContent=cellSize+" px";
   drawGrid();
 }
 
-function parsePositions(value) {
-  if (typeof value === "string") {
-    try {
-      value = JSON.parse(value);
-    } catch {
-      return [];
-    }
+function drawGrid(){
+  ctx.clearRect(0,0,GRID,GRID);
+  ctx.fillStyle="#252a30";
+  ctx.fillRect(0,0,GRID,GRID);
+
+  ctx.fillStyle="#687078";
+  for(const index of occupied){
+    ctx.fillRect(index%GRID,Math.floor(index/GRID),1,1);
   }
 
-  if (!Array.isArray(value)) return [];
-
-  return value
-    .map(Number)
-    .filter(n => Number.isInteger(n) && n >= 0 && n < TOTAL_PIXELS);
-}
-
-function getAdBounds(positions) {
-  if (!positions.length) return null;
-
-  let minX = GRID;
-  let minY = GRID;
-  let maxX = -1;
-  let maxY = -1;
-
-  for (const index of positions) {
-    const x = index % GRID;
-    const y = Math.floor(index / GRID);
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
+  ctx.fillStyle="#a5ff38";
+  for(const index of selected){
+    ctx.fillRect(index%GRID,Math.floor(index/GRID),1,1);
   }
 
-  return {
-    x:minX,
-    y:minY,
-    width:maxX - minX + 1,
-    height:maxY - minY + 1
-  };
-}
+  if(preview){
+    const left=Math.min(preview.x1,preview.x2);
+    const right=Math.max(preview.x1,preview.x2);
+    const top=Math.min(preview.y1,preview.y2);
+    const bottom=Math.max(preview.y1,preview.y2);
 
-function drawGrid() {
-  ctx.clearRect(0, 0, GRID, GRID);
-  ctx.fillStyle = "#252a30";
-  ctx.fillRect(0, 0, GRID, GRID);
-
-  // Pixel occupati: colore di base.
-  ctx.fillStyle = "#687078";
-  for (const index of occupied) {
-    ctx.fillRect(index % GRID, Math.floor(index / GRID), 1, 1);
-  }
-
-  // Loghi degli annunci approvati.
-  for (const ad of approvedAds) {
-    if (!ad.image || !ad.image.complete || !ad.image.naturalWidth || !ad.bounds) {
-      continue;
-    }
-
-    ctx.save();
-    ctx.imageSmoothingEnabled = true;
-
-    try {
-      ctx.drawImage(
-        ad.image,
-        ad.bounds.x,
-        ad.bounds.y,
-        ad.bounds.width,
-        ad.bounds.height
-      );
-    } catch (error) {
-      console.error("Errore disegno logo:", error);
-    }
-
-    ctx.restore();
-  }
-
-  // Selezione corrente in verde, sopra il contenuto già pubblicato.
-  ctx.fillStyle = "#a5ff38";
-  for (const index of selected) {
-    ctx.fillRect(index % GRID, Math.floor(index / GRID), 1, 1);
-  }
-
-  if (preview) {
-    const left = Math.min(preview.x1, preview.x2);
-    const right = Math.max(preview.x1, preview.x2);
-    const top = Math.min(preview.y1, preview.y2);
-    const bottom = Math.max(preview.y1, preview.y2);
-
-    ctx.fillStyle = "rgba(165,255,56,0.45)";
-    ctx.fillRect(left, top, right - left + 1, bottom - top + 1);
+    ctx.fillStyle="rgba(165,255,56,0.45)";
+    ctx.fillRect(left,top,right-left+1,bottom-top+1);
   }
 }
 
-function updateProgress() {
-  const sold = occupied.size;
-  const percentage = (sold / TOTAL_PIXELS) * 100;
-
-  document.getElementById("progressLabel").textContent =
-    percentage.toLocaleString("it-IT", { maximumFractionDigits:4 }) + "% completato";
-
-  document.getElementById("progressFill").style.width =
-    Math.min(100, percentage) + "%";
-
-  document.getElementById("progressBar").setAttribute("aria-valuenow", sold);
+function hideLogoTooltip(){
+  logoTooltip.style.display="none";
 }
 
-function updateSummary() {
-  const count = selected.size;
-
-  document.getElementById("headerSelected").textContent = formatNumber(count);
-  document.getElementById("summaryPixels").textContent = formatNumber(count);
-  document.getElementById("summaryPrice").textContent =
-    formatEuro(count * PRICE_PER_PIXEL);
-
-  updateProgress();
+function findApprovedAdAt(index){
+  return approvedAds.find(ad=>ad.positions.includes(index))||null;
 }
 
-async function loadApprovedPixelAds() {
-  try {
-    const response = await fetch(
+function showLogoTooltip(ad,event,index){
+  if(!ad){
+    hideLogoTooltip();
+    return;
+  }
+
+  tooltipCompany.textContent=ad.company_name||"Azienda";
+  tooltipPosition.textContent="Pixel occupato · "+formatNumber(index+1);
+
+  if(ad.image_url){
+    tooltipLogo.src=ad.image_url;
+    tooltipLogo.style.display="block";
+  }else{
+    tooltipLogo.removeAttribute("src");
+    tooltipLogo.style.display="none";
+  }
+
+  logoTooltip.style.display="block";
+
+  const rect=viewport.getBoundingClientRect();
+  let left=event.clientX-rect.left+viewport.scrollLeft+14;
+  let top=event.clientY-rect.top+viewport.scrollTop+14;
+
+  const maxLeft=viewport.scrollLeft+viewport.clientWidth-logoTooltip.offsetWidth-8;
+  const maxTop=viewport.scrollTop+viewport.clientHeight-logoTooltip.offsetHeight-8;
+
+  if(left>maxLeft){
+    left=event.clientX-rect.left+viewport.scrollLeft-logoTooltip.offsetWidth-14;
+  }
+
+  if(top>maxTop){
+    top=event.clientY-rect.top+viewport.scrollTop-logoTooltip.offsetHeight-14;
+  }
+
+  left=Math.max(viewport.scrollLeft+6,Math.min(left,maxLeft));
+  top=Math.max(viewport.scrollTop+6,Math.min(top,maxTop));
+
+  logoTooltip.style.left=left+"px";
+  logoTooltip.style.top=top+"px";
+}
+
+async function loadOccupiedPixels(){
+  try{
+    const response=await fetch(
       `${SUPABASE_URL}/rest/v1/rpc/get_approved_pixel_ads`,
       {
         method:"POST",
@@ -797,134 +373,125 @@ async function loadApprovedPixelAds() {
       }
     );
 
-    if (!response.ok) {
-      console.error(
-        "Errore nel recupero degli annunci:",
-        response.status,
-        await response.text()
-      );
+    if(!response.ok){
+      console.error("Errore caricamento annunci approvati:",await response.text());
       return;
     }
 
-    const data = await response.json();
-
-    if (!Array.isArray(data)) {
-      console.error("Risposta inattesa da get_approved_pixel_ads.");
-      return;
-    }
-
+    const ads=await response.json();
     occupied.clear();
-    approvedAds = [];
+    approvedAds=[];
 
-    for (const item of data) {
-      const positions = parsePositions(item.pixel_positions);
+    for(const ad of ads){
+      let positions=ad.pixel_positions;
 
-      for (const position of positions) {
-        occupied.add(position);
+      if(typeof positions==="string"){
+        try{
+          positions=JSON.parse(positions);
+        }catch{
+          positions=[];
+        }
       }
 
-      const ad = {
-        company_name:item.company_name || "",
-        positions,
-        bounds:getAdBounds(positions),
-        image:null
+      if(!Array.isArray(positions)){
+        positions=[];
+      }
+
+      const normalized=positions
+        .map(Number)
+        .filter(n=>Number.isInteger(n)&&n>=0&&n<GRID*GRID);
+
+      const item={
+        company_name:ad.company_name||"Azienda",
+        image_url:ad.image_url||null,
+        positions:normalized
       };
 
-      if (typeof item.image_url === "string" && item.image_url.trim()) {
-        const image = new Image();
+      approvedAds.push(item);
 
-        image.onload = drawGrid;
-        image.onerror = () => {
-          console.error(
-            "Immagine non accessibile per l'annuncio:",
-            ad.company_name,
-            item.image_url
-          );
-        };
-
-        image.src = item.image_url;
-        ad.image = image;
+      for(const position of normalized){
+        occupied.add(position);
       }
-
-      approvedAds.push(ad);
     }
 
     drawGrid();
-    updateSummary();
-
-    console.log(
-      "Annunci approvati:",
-      approvedAds.length,
-      "| Immagini con URL:",
-      approvedAds.filter(ad => ad.image).length
-    );
-  } catch (error) {
-    console.error("Errore collegamento Supabase:", error);
+  }catch(error){
+    console.error("Errore di connessione:",error);
   }
 }
 
-function getCellFromPointer(event) {
-  const rect = canvas.getBoundingClientRect();
+function updateSummary(){
+  const count=selected.size;
 
-  const x = Math.floor(((event.clientX - rect.left) / rect.width) * GRID);
-  const y = Math.floor(((event.clientY - rect.top) / rect.height) * GRID);
+  document.getElementById("headerSelected").textContent=formatNumber(count);
+  document.getElementById("summaryPixels").textContent=formatNumber(count);
+  document.getElementById("summaryPrice").textContent=formatEuro(count*PRICE_PER_PIXEL);
+}
 
-  return {
-    x:Math.max(0, Math.min(GRID - 1, x)),
-    y:Math.max(0, Math.min(GRID - 1, y))
+function getCellFromPointer(event){
+  const rect=canvas.getBoundingClientRect();
+
+  const x=Math.floor(((event.clientX-rect.left)/rect.width)*GRID);
+  const y=Math.floor(((event.clientY-rect.top)/rect.height)*GRID);
+
+  return{
+    x:Math.max(0,Math.min(GRID-1,x)),
+    y:Math.max(0,Math.min(GRID-1,y))
   };
 }
 
-function addRectangleToSelection(rectangle) {
-  const left = Math.min(rectangle.x1, rectangle.x2);
-  const right = Math.max(rectangle.x1, rectangle.x2);
-  const top = Math.min(rectangle.y1, rectangle.y2);
-  const bottom = Math.max(rectangle.y1, rectangle.y2);
+function addRectangleToSelection(rectangle){
+  const left=Math.min(rectangle.x1,rectangle.x2);
+  const right=Math.max(rectangle.x1,rectangle.x2);
+  const top=Math.min(rectangle.y1,rectangle.y2);
+  const bottom=Math.max(rectangle.y1,rectangle.y2);
 
-  for (let y = top; y <= bottom; y++) {
-    for (let x = left; x <= right; x++) {
-      const index = y * GRID + x;
+  for(let y=top;y<=bottom;y++){
+    for(let x=left;x<=right;x++){
+      const index=y*GRID+x;
 
-      if (!occupied.has(index)) selected.add(index);
+      if(!occupied.has(index)){
+        selected.add(index);
+      }
     }
   }
 }
 
-async function uploadLogo(file) {
-  if (!file) return null;
+async function uploadLogo(file){
+  if(!file)return null;
 
-  if (!ALLOWED_LOGO_TYPES.has(file.type)) {
+  if(!ALLOWED_LOGO_TYPES.has(file.type)){
     throw new Error("Formato immagine non supportato. Usa JPG, PNG, WEBP o GIF.");
   }
 
-  if (file.size > MAX_LOGO_BYTES) {
-    throw new Error("Il logo supera il limite di 5 MB.");
+  if(file.size>MAX_LOGO_BYTES){
+    throw new Error("Il logo supera il limite di 5 MB. Scegli un'immagine più piccola.");
   }
 
-  const extensions = {
+  const extensionByType={
     "image/jpeg":"jpg",
     "image/png":"png",
     "image/webp":"webp",
     "image/gif":"gif"
   };
 
-  const extension = extensions[file.type];
+  const extension=extensionByType[file.type];
 
-  const randomPart = (
-    typeof crypto !== "undefined" &&
-    typeof crypto.randomUUID === "function"
-  )
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  if(!extension){
+    throw new Error("Impossibile determinare il formato del logo.");
+  }
 
-  const imagePath = `pending/${randomPart}.${extension}`;
-  const uploadUrl =
-    `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${imagePath}`;
+  const randomPart=(typeof crypto!=="undefined"&&crypto.randomUUID)
+    ?crypto.randomUUID()
+    :`${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+  const imagePath=`pending/${randomPart}.${extension}`;
+  const uploadUrl=`${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${imagePath}`;
 
   let response;
 
-  try {
-    response = await fetch(uploadUrl, {
+  try{
+    response=await fetch(uploadUrl,{
       method:"POST",
       headers:{
         apikey:SUPABASE_KEY,
@@ -935,32 +502,45 @@ async function uploadLogo(file) {
       },
       body:file
     });
-  } catch (error) {
-    console.error("Errore di rete durante il caricamento:", error);
-    throw new Error("Impossibile contattare Supabase Storage. Controlla la connessione.");
+  }catch(error){
+    console.error("Errore di rete durante l'upload del logo:",error);
+    throw new Error("Il browser non riesce a contattare Supabase Storage. Controlla la connessione o le impostazioni CORS.");
   }
 
-  if (!response.ok) {
-    const details = await response.text();
-    console.error("Errore upload logo:", response.status, details);
-    throw new Error(`Caricamento logo fallito (${response.status}): ${details}`);
+  if(!response.ok){
+    const details=await response.text();
+    console.error("Errore upload logo:",response.status,details);
+    throw new Error(`Caricamento logo fallito (${response.status}): ${details||response.statusText}`);
   }
 
-  return {
+  return{
     image_path:imagePath,
     image_url:`${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${imagePath}`
   };
 }
 
-canvas.addEventListener("pointerdown", function(event) {
-  if (event.pointerType === "mouse" && event.button !== 0) return;
+canvas.addEventListener("pointerdown",function(event){
+  if(event.pointerType==="mouse"&&event.button!==0)return;
 
+  const cell=getCellFromPointer(event);
+  const index=cell.y*GRID+cell.x;
+
+  if(occupied.has(index)){
+    const ad=findApprovedAdAt(index);
+
+    if(ad){
+      event.preventDefault();
+      showLogoTooltip(ad,event,index);
+      return;
+    }
+  }
+
+  hideLogoTooltip();
   event.preventDefault();
-  const cell = getCellFromPointer(event);
 
-  dragging = true;
-  dragStart = cell;
-  preview = {
+  dragging=true;
+  dragStart=cell;
+  preview={
     x1:cell.x,
     y1:cell.y,
     x2:cell.x,
@@ -971,25 +551,42 @@ canvas.addEventListener("pointerdown", function(event) {
   drawGrid();
 });
 
-canvas.addEventListener("pointermove", function(event) {
-  if (!dragging || !dragStart) return;
+canvas.addEventListener("pointermove",function(event){
+  if(dragging&&dragStart){
+    hideLogoTooltip();
 
-  const cell = getCellFromPointer(event);
+    const cell=getCellFromPointer(event);
 
-  preview = {
-    x1:dragStart.x,
-    y1:dragStart.y,
-    x2:cell.x,
-    y2:cell.y
-  };
+    preview={
+      x1:dragStart.x,
+      y1:dragStart.y,
+      x2:cell.x,
+      y2:cell.y
+    };
 
-  drawGrid();
+    drawGrid();
+    return;
+  }
+
+  if(event.pointerType==="touch")return;
+
+  const cell=getCellFromPointer(event);
+  const index=cell.y*GRID+cell.x;
+
+  if(!occupied.has(index)){
+    hideLogoTooltip();
+    return;
+  }
+
+  showLogoTooltip(findApprovedAdAt(index),event,index);
 });
 
-function finishSelection(event) {
-  if (!dragging || !dragStart) return;
+canvas.addEventListener("pointerleave",hideLogoTooltip);
 
-  const cell = getCellFromPointer(event);
+function finishSelection(event){
+  if(!dragging||!dragStart)return;
+
+  const cell=getCellFromPointer(event);
 
   addRectangleToSelection({
     x1:dragStart.x,
@@ -998,182 +595,170 @@ function finishSelection(event) {
     y2:cell.y
   });
 
-  dragging = false;
-  dragStart = null;
-  preview = null;
+  dragging=false;
+  dragStart=null;
+  preview=null;
 
   drawGrid();
   updateSummary();
 }
 
-canvas.addEventListener("pointerup", finishSelection);
+canvas.addEventListener("pointerup",finishSelection);
 
-canvas.addEventListener("pointercancel", function() {
-  dragging = false;
-  dragStart = null;
-  preview = null;
+canvas.addEventListener("pointercancel",function(){
+  dragging=false;
+  dragStart=null;
+  preview=null;
+  hideLogoTooltip();
   drawGrid();
 });
 
-document.getElementById("zoomIn").addEventListener("click", function() {
-  if (cellSize < 60) {
-    cellSize += 10;
+document.getElementById("zoomIn").addEventListener("click",function(){
+  if(cellSize<60){
+    cellSize+=10;
     updateCanvasSize();
   }
 });
 
-document.getElementById("zoomOut").addEventListener("click", function() {
-  if (cellSize > 10) {
-    cellSize -= 10;
+document.getElementById("zoomOut").addEventListener("click",function(){
+  if(cellSize>10){
+    cellSize-=10;
     updateCanvasSize();
   }
 });
 
-document.getElementById("clearSelection").addEventListener("click", function() {
+document.getElementById("clearSelection").addEventListener("click",function(){
   selected.clear();
-  preview = null;
-  dragging = false;
-  dragStart = null;
+  preview=null;
+  dragging=false;
+  dragStart=null;
 
   drawGrid();
   updateSummary();
-  document.getElementById("requestOutput").style.display = "none";
+  document.getElementById("requestOutput").style.display="none";
 });
 
-document.getElementById("logo").addEventListener("change", function() {
-  const file = this.files[0];
-  const image = document.getElementById("logoPreview");
+document.getElementById("logo").addEventListener("change",function(){
+  const file=this.files[0];
+  const image=document.getElementById("logoPreview");
 
-  if (!file) {
+  if(!file){
     image.removeAttribute("src");
-    image.style.display = "none";
+    image.style.display="none";
     return;
   }
 
-  if (!ALLOWED_LOGO_TYPES.has(file.type)) {
+  if(!ALLOWED_LOGO_TYPES.has(file.type)){
     alert("Formato non valido. Seleziona JPG, PNG, WEBP o GIF.");
-    this.value = "";
+    this.value="";
     image.removeAttribute("src");
-    image.style.display = "none";
+    image.style.display="none";
     return;
   }
 
-  if (file.size > MAX_LOGO_BYTES) {
-    alert("L'immagine supera il limite di 5 MB.");
-    this.value = "";
+  if(file.size>MAX_LOGO_BYTES){
+    alert("L'immagine supera il limite di 5 MB. Scegline una più piccola.");
+    this.value="";
     image.removeAttribute("src");
-    image.style.display = "none";
+    image.style.display="none";
     return;
   }
 
-  const reader = new FileReader();
+  const reader=new FileReader();
 
-  reader.onload = function(event) {
-    image.src = event.target.result;
-    image.style.display = "block";
+  reader.onload=function(event){
+    image.src=event.target.result;
+    image.style.display="block";
   };
 
   reader.readAsDataURL(file);
 });
 
-document.getElementById("purchaseForm").addEventListener("submit", async function(event) {
+document.getElementById("purchaseForm").addEventListener("submit",async function(event){
   event.preventDefault();
 
-  if (selected.size === 0) {
+  if(selected.size===0){
     alert("Seleziona almeno un pixel prima di continuare.");
-    document.getElementById("griglia").scrollIntoView({ behavior:"smooth" });
+    document.getElementById("griglia").scrollIntoView({behavior:"smooth"});
     return;
   }
 
-  const company = document.getElementById("company").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const website = document.getElementById("website").value.trim();
-  const notes = document.getElementById("notes").value.trim();
-  const positions = Array.from(selected);
-  const logoFile = document.getElementById("logo").files[0] || null;
+  const company=document.getElementById("company").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const website=document.getElementById("website").value.trim();
+  const notes=document.getElementById("notes").value.trim();
+  const positions=Array.from(selected);
+  const logoFile=document.getElementById("logo").files[0]||null;
+  const output=document.getElementById("requestOutput");
+  const button=this.querySelector('button[type="submit"]');
 
-  const output = document.getElementById("requestOutput");
-  const submitButton = this.querySelector('button[type="submit"]');
+  output.style.display="block";
+  button.disabled=true;
 
-  output.style.display = "block";
-  submitButton.disabled = true;
+  try{
+    let logoInfo=null;
 
-  try {
-    let logoInfo = null;
-
-    if (logoFile) {
-      output.textContent = "Caricamento del logo su Supabase in corso...";
-      logoInfo = await uploadLogo(logoFile);
+    if(logoFile){
+      output.textContent="Caricamento del logo su Supabase in corso...";
+      logoInfo=await uploadLogo(logoFile);
     }
 
-    output.textContent = "Preparazione del pagamento Stripe in corso...";
+    output.textContent="Preparazione del pagamento Stripe in corso...";
 
-    const response = await fetch(
-      `${SUPABASE_URL}/functions/v1/create-checkout`,
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          apikey:SUPABASE_KEY,
-          Authorization:`Bearer ${SUPABASE_KEY}`
-        },
-        body:JSON.stringify({
-          company_name:company,
-          email,
-          website_url:website,
-          message:notes,
-          pixel_positions:positions,
-          image_url:logoInfo ? logoInfo.image_url : null,
-          image_path:logoInfo ? logoInfo.image_path : null
-        })
-      }
-    );
+    const response=await fetch(SUPABASE_URL+"/functions/v1/create-checkout",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer "+SUPABASE_KEY
+      },
+      body:JSON.stringify({
+        company_name:company,
+        email:email,
+        website_url:website,
+        message:notes,
+        pixel_positions:positions,
+        image_url:logoInfo?logoInfo.image_url:null,
+        image_path:logoInfo?logoInfo.image_path:null
+      })
+    });
 
-    const responseText = await response.text();
     let result;
 
-    try {
-      result = JSON.parse(responseText);
-    } catch {
-      throw new Error(
-        `Risposta non valida dal server (${response.status}): ${responseText.slice(0,300)}`
-      );
+    try{
+      result=await response.json();
+    }catch{
+      throw new Error("Risposta non valida dal server.");
     }
 
-    if (!response.ok) {
-      throw new Error(result.error || `Errore del server (${response.status}).`);
+    if(!response.ok){
+      throw new Error(result.error||"Errore durante la preparazione del pagamento.");
     }
 
-    if (!result.checkout_url) {
+    if(!result.checkout_url){
       throw new Error("Stripe non ha restituito il link di pagamento.");
     }
 
-    const checkoutUrl = new URL(result.checkout_url);
+    const checkoutUrl=new URL(result.checkout_url);
 
-    if (
-      checkoutUrl.protocol !== "https:" ||
-      checkoutUrl.hostname !== "checkout.stripe.com"
-    ) {
+    if(checkoutUrl.protocol!=="https:"||checkoutUrl.hostname!=="checkout.stripe.com"){
       throw new Error("Indirizzo di pagamento Stripe non valido.");
     }
 
-    output.textContent = "Apertura della pagina di pagamento...";
+    output.textContent="Apertura della pagina di pagamento...";
     window.location.assign(checkoutUrl.href);
-  } catch (error) {
-    console.error("Errore checkout:", error);
 
-    output.textContent =
-      "Non è stato possibile proseguire. " +
-      (error instanceof Error ? error.message : "Errore di connessione.");
-
-    submitButton.disabled = false;
+  }catch(error){
+    console.error("Errore checkout:",error);
+    output.textContent="Non è stato possibile aprire il pagamento. "+(error instanceof Error?error.message:"Errore di connessione.");
+    button.disabled=false;
   }
 });
 
 createHeroPixelArt();
 updateCanvasSize();
 updateSummary();
-loadApprovedPixelAds();
+loadOccupiedPixels();
 </script>
 </body>
 </html>
